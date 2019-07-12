@@ -1,4 +1,6 @@
 ﻿using ArborateVirtualMachine.Entity;
+using ArborateVirtualMachine.Exception;
+using static ArborateVirtualMachine.Exception.InvalidSourceDetail;
 using System;
 using System.Collections.Generic;
 
@@ -41,6 +43,11 @@ namespace ArborateVirtualMachine
                 }
 
                 instructionNumber = nextInstructionNumber;
+            }
+
+            if (stack.Count != definition.OutParams.Count)
+            {
+                throw new InvalidSourceException(IncorrectReturnArgumentCount, $"Incorrect number of elements on stack at function exit (expected {definition?.OutParams?.Count}, actual {stack?.Count}).");
             }
 
             return stack.Pop();
