@@ -38,36 +38,17 @@ namespace ArborateVirtualMachine.Test
             Assert.True(actual);
         }
 
-        [Fact]
-        public void FunctionWithEmptyReturnStackThrows()
+        [Theory]
+        [InlineData(0, 1)]
+        [InlineData(1, 2)]
+        [InlineData(2, 1)]
+        public void FunctionWithIncorrectReturnArgumentCountThrows(int stackCount, int outParamCount)
         {
-            var inst = new List<Instruction>()
-            {
-            };
-            var exception = Assert.Throws<InvalidSourceException>(() => ExecuteBooleanFunction(inst));
-            Assert.Equal(InvalidSourceDetail.IncorrectReturnArgumentCount, exception.DetailCode);
-        }
+            var inst = Enumerable.Repeat(0, stackCount).Select(dummy => new Instruction(BooleanConstantToStack, true)).ToList();
+            var outParams = Enumerable.Repeat(VmType.Boolean, outParamCount).ToList();
 
-        [Fact]
-        public void FunctionWithTooShortReturnStackThrows()
-        {
-            var inst = new List<Instruction>()
-            {
-                new Instruction(BooleanConstantToStack, true)
-            };
-            var exception = Assert.Throws<InvalidSourceException>(() => ExecuteFunction(inst, outParams: new List<VmType>() { VmType.Boolean, VmType.Boolean }));
-            Assert.Equal(InvalidSourceDetail.IncorrectReturnArgumentCount, exception.DetailCode);
-        }
+            var exception = Assert.Throws<InvalidSourceException>(() => ExecuteFunction(inst, outParams: outParams));
 
-        [Fact]
-        public void FunctionWithTooLongReturnStackThrows()
-        {
-            var inst = new List<Instruction>()
-            {
-                new Instruction(BooleanConstantToStack, true),
-                new Instruction(BooleanConstantToStack, true)
-            };
-            var exception = Assert.Throws<InvalidSourceException>(() => ExecuteBooleanFunction(inst));
             Assert.Equal(InvalidSourceDetail.IncorrectReturnArgumentCount, exception.DetailCode);
         }
     }
