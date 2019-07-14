@@ -51,5 +51,43 @@ namespace ArborateVirtualMachine.Test
 
             Assert.Equal(InvalidSourceDetail.IncorrectReturnArgumentCount, exception.DetailCode);
         }
+
+        public static IEnumerable<object[]> MemberData_FunctionWithIncorrectReturnArgumentTypeThrows =>
+            new List<object[]>
+            {
+                new object[] {new VmType[] { VmType.Boolean }, new VmType[] { VmType.Integer }},
+                new object[] {new VmType[] { VmType.Integer }, new VmType[] { VmType.Boolean }},
+                new object[] {new VmType[] { VmType.Boolean, VmType.Boolean }, new VmType[] { VmType.Boolean, VmType.Integer }},
+                new object[] {new VmType[] { VmType.Boolean, VmType.Boolean }, new VmType[] { VmType.Integer, VmType.Integer }},
+                new object[] {new VmType[] { VmType.Integer, VmType.Boolean }, new VmType[] { VmType.Boolean, VmType.Integer }},
+            };
+
+        [Theory]
+        [MemberData(nameof(MemberData_FunctionWithIncorrectReturnArgumentTypeThrows))]
+        public void FunctionWithIncorrectReturnArgumentTypeThrows(VmType[] outParams, VmType[] stackParams)
+        {
+            var instructions = new List<Instruction>();
+            foreach(var vmType in Enumerable.Reverse(stackParams))
+            {
+                switch (vmType)
+                {
+                    case VmType.Boolean:
+                        instructions.Add(new Instruction(BooleanConstantToStack, true));
+                        break;
+
+                    case VmType.Integer:
+                        instructions.Add(new Instruction(IntegerConstantToStack, 100L));
+                        break;
+
+                    default:
+                        Assert.True(false); // invalid data for test.
+                        break;
+                }
+            }
+
+            var exception = Assert.Throws<InvalidSourceException>(() => ExecuteFunction(instructions, outParams: outParams));
+
+            Assert.Equal(InvalidSourceDetail.IncorrectReturnArgumentType, exception.DetailCode);
+        }
     }
 }

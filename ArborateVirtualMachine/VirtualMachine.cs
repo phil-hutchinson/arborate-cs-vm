@@ -40,6 +40,13 @@ namespace ArborateVirtualMachine
                         }
                         break;
 
+                    case InstructionCode.IntegerConstantToStack:
+                        {
+                            long data = (long)currentInstruction.Data;
+                            var value = new VmInteger(data);
+                            stack.Push(value);
+                        }
+                        break;
                 }
 
                 instructionNumber = nextInstructionNumber;
@@ -48,6 +55,16 @@ namespace ArborateVirtualMachine
             if (stack.Count != definition.OutParams.Count)
             {
                 throw new InvalidSourceException(IncorrectReturnArgumentCount, $"Incorrect number of elements on stack at function exit (expected {definition?.OutParams?.Count}, actual {stack?.Count}).");
+            }
+
+            var stackEnum = stack.GetEnumerator();
+            var outParamEnum = definition.OutParams.GetEnumerator();
+            while (stackEnum.MoveNext() && outParamEnum.MoveNext())
+            {
+                if (stackEnum.Current.VmType != outParamEnum.Current)
+                {
+                    throw new InvalidSourceException(IncorrectReturnArgumentType, $"Incorrect element type on stack at function exit (expected {outParamEnum?.Current.ToString()}, actual {stackEnum.Current.ToString()}).");
+                }
             }
 
             return stack.Pop();

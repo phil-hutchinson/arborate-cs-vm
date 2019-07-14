@@ -6,5 +6,6 @@ namespace ArborateVirtualMachine.Entity
 {
     public abstract class VmValue
     {
+        public abstract VmType VmType { get; }
     }
 }
