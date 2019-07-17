@@ -20,8 +20,8 @@ namespace ArborateVirtualMachine.Test
         {
             inParams = inParams ?? new List<VmType>();
             outParams = outParams ?? new List<VmType>();
-            var inst = new FunctionDefinition(instructions, inParams, outParams, varCount);
-            var machine = new VirtualMachine(inst);
+            var functionDefinition = new FunctionDefinition(instructions, inParams, outParams, varCount);
+            var machine = new VirtualMachine(functionDefinition);
             var executionResult = machine.Execute();
             return new List<VmValue>() { executionResult };
             //yield return executionResult; // can remove the yield when vm returns multiple types properly
@@ -88,6 +88,20 @@ namespace ArborateVirtualMachine.Test
             var exception = Assert.Throws<InvalidSourceException>(() => ExecuteFunction(instructions, outParams: outParams));
 
             Assert.Equal(InvalidSourceDetail.IncorrectReturnArgumentType, exception.DetailCode);
+        }
+
+        [Fact]
+        public void FunctionWithoutReturnTypeThrowsOnVirtualMachineCreation()
+        {
+            var instructions = new List<Instruction>()
+            {
+                new Instruction(BooleanConstantToStack, true),
+            };
+
+            var functionDefinition = new FunctionDefinition(instructions, new List<VmType>(), new List<VmType>(), 0);
+            var exception = Assert.Throws<InvalidSourceException>(() => new VirtualMachine(functionDefinition));
+
+            Assert.Equal(InvalidSourceDetail.FunctionDefinitionMissingReturnValue, exception.DetailCode);
         }
     }
 }

@@ -13,6 +13,11 @@ namespace ArborateVirtualMachine
         public VirtualMachine(FunctionDefinition definition)
         {
             Definition = definition;
+
+            if (definition.OutParams.Count == 0)
+            {
+                throw new InvalidSourceException(InvalidSourceDetail.FunctionDefinitionMissingReturnValue);
+            }
         }
 
         public VmValue Execute()
