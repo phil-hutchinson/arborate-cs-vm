@@ -103,5 +103,21 @@ namespace ArborateVirtualMachine.Test
 
             Assert.Equal(InvalidSourceDetail.FunctionDefinitionMissingReturnValue, exception.DetailCode);
         }
+
+        [Theory]
+        [InlineData(-1)]
+        [InlineData(-2)]
+        [InlineData(-3)]
+        public void FunctionWithInvalidInstructionCodesThrows(int instructionCode)
+        {
+            var instructions = new List<Instruction>()
+            {
+                new Instruction((InstructionCode)instructionCode),
+            };
+            var functionDefinition = new FunctionDefinition(instructions, new List<VmType>(), new List<VmType>() { VmType.Boolean }, 0);
+            var exception = Assert.Throws<InvalidSourceException>(() => new VirtualMachine(functionDefinition));
+
+            Assert.Equal(InvalidSourceDetail.InvalidInstruction, exception.DetailCode);
+        }
     }
 }

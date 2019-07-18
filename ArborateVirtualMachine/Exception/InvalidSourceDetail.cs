@@ -6,5 +6,6 @@
         IncorrectReturnArgumentCount,
         IncorrectReturnArgumentType,
         FunctionDefinitionMissingReturnValue,
+        InvalidInstruction,
     }
 }

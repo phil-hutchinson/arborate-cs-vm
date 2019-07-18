@@ -1,5 +1,6 @@
 ﻿using ArborateVirtualMachine.Entity;
 using ArborateVirtualMachine.Exception;
+using static ArborateVirtualMachine.Entity.InstructionCode;
 using static ArborateVirtualMachine.Exception.InvalidSourceDetail;
 using System;
 using System.Collections.Generic;
@@ -14,9 +15,21 @@ namespace ArborateVirtualMachine
         {
             Definition = definition;
 
+            foreach(var instruction in Definition.Code)
+            {
+                CheckInstruction(instruction);
+            }
+
             if (definition.OutParams.Count == 0)
             {
                 throw new InvalidSourceException(InvalidSourceDetail.FunctionDefinitionMissingReturnValue);
+            }
+        }
+
+        private void CheckInstruction(Instruction instruction)
+        {
+            if (!Enum.IsDefined(typeof(InstructionCode), instruction.InstructionCode)) { 
+                throw new InvalidSourceException(InvalidInstruction);
             }
         }
 
@@ -37,7 +50,7 @@ namespace ArborateVirtualMachine
 
                 switch(currentInstruction.InstructionCode)
                 {
-                    case InstructionCode.BooleanConstantToStack:
+                    case BooleanConstantToStack:
                         {
                             bool data = (bool)currentInstruction.Data;
                             var value = new VmBoolean(data);
@@ -45,7 +58,7 @@ namespace ArborateVirtualMachine
                         }
                         break;
 
-                    case InstructionCode.IntegerConstantToStack:
+                    case IntegerConstantToStack:
                         {
                             long data = (long)currentInstruction.Data;
                             var value = new VmInteger(data);
