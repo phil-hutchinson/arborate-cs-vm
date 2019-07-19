@@ -22,7 +22,7 @@ namespace ArborateVirtualMachine
 
             if (definition.OutParams.Count == 0)
             {
-                throw new InvalidSourceException(InvalidSourceDetail.FunctionDefinitionMissingReturnValue);
+                throw new InvalidSourceException(FunctionDefinitionMissingReturnValue);
             }
         }
 
@@ -30,6 +30,20 @@ namespace ArborateVirtualMachine
         {
             if (!Enum.IsDefined(typeof(InstructionCode), instruction.InstructionCode)) { 
                 throw new InvalidSourceException(InvalidInstruction);
+            }
+
+            switch(instruction.InstructionCode)
+            {
+                case BooleanConstantToStack:
+                    if (instruction.Data == null)
+                    {
+                        throw new InvalidSourceException(MissingInstructionData);
+                    }
+                    if (!(instruction.Data is Boolean))
+                    {
+                        throw new InvalidSourceException(InvalidInstructionData);
+                    }
+                    break;
             }
         }
 

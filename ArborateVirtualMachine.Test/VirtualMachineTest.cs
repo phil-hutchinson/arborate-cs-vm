@@ -27,15 +27,17 @@ namespace ArborateVirtualMachine.Test
             //yield return executionResult; // can remove the yield when vm returns multiple types properly
         }
 
-        [Fact]
-        public void SimpleFunctionExecutesCorrectly()
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public void BooleanToStackExecutesCorrectly(bool value)
         {
             var inst = new List<Instruction>()
             {
-                new Instruction(BooleanConstantToStack, true)
+                new Instruction(BooleanConstantToStack, value)
             };
             var actual = ExecuteBooleanFunction(inst);
-            Assert.True(actual);
+            Assert.Equal(value, actual);
         }
 
         [Theory]
@@ -118,6 +120,36 @@ namespace ArborateVirtualMachine.Test
             var exception = Assert.Throws<InvalidSourceException>(() => new VirtualMachine(functionDefinition));
 
             Assert.Equal(InvalidSourceDetail.InvalidInstruction, exception.DetailCode);
+        }
+
+        [Theory]
+        [InlineData(BooleanConstantToStack)]
+        public void InstructionMissingRequiredDataThrows(InstructionCode instructionCode)
+        {
+            var instructions = new List<Instruction>()
+            {
+                new Instruction(instructionCode)
+            };
+
+            var functionDefinition = new FunctionDefinition(instructions, new List<VmType>(), new List<VmType>() { VmType.Boolean }, 0);
+            var exception = Assert.Throws<InvalidSourceException>(() => new VirtualMachine(functionDefinition));
+
+            Assert.Equal(InvalidSourceDetail.MissingInstructionData, exception.DetailCode);
+        }
+
+        [Theory]
+        [InlineData(BooleanConstantToStack)]
+        public void InstructionWithInvalidBooleanDataThrows(InstructionCode instructionCode)
+        {
+            var instructions = new List<Instruction>()
+            {
+                new Instruction(instructionCode, 0L)
+            };
+
+            var functionDefinition = new FunctionDefinition(instructions, new List<VmType>(), new List<VmType>() { VmType.Boolean }, 0);
+            var exception = Assert.Throws<InvalidSourceException>(() => new VirtualMachine(functionDefinition));
+
+            Assert.Equal(InvalidSourceDetail.InvalidInstructionData, exception.DetailCode);
         }
     }
 }

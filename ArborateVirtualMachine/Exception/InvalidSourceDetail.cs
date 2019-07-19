@@ -7,5 +7,7 @@
         IncorrectReturnArgumentType,
         FunctionDefinitionMissingReturnValue,
         InvalidInstruction,
+        MissingInstructionData,
+        InvalidInstructionData,
     }
 }
