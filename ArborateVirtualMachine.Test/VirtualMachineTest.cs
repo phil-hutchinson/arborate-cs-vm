@@ -8,38 +8,8 @@ using System.Linq;
 
 namespace ArborateVirtualMachine.Test
 {
-    public class VirtualMachineTest
+    public class VirtualMachineTest: BaseTest
     {
-        private bool ExecuteBooleanFunction(IEnumerable<Instruction> instructions)
-        {
-            var executionResult = ExecuteFunction(instructions, outParams: new List<VmType> { VmType.Boolean });
-            return ((VmBoolean)executionResult.Single()).Val;
-        }
-
-        private IEnumerable<VmValue> ExecuteFunction(IEnumerable<Instruction> instructions, IEnumerable<VmType> inParams = null, IEnumerable<VmType> outParams = null, int varCount = 0)
-        {
-            inParams = inParams ?? new List<VmType>();
-            outParams = outParams ?? new List<VmType>();
-            var functionDefinition = new FunctionDefinition(instructions, inParams, outParams, varCount);
-            var machine = new VirtualMachine(functionDefinition);
-            var executionResult = machine.Execute();
-            return new List<VmValue>() { executionResult };
-            //yield return executionResult; // can remove the yield when vm returns multiple types properly
-        }
-
-        [Theory]
-        [InlineData(false)]
-        [InlineData(true)]
-        public void BooleanToStackExecutesCorrectly(bool value)
-        {
-            var inst = new List<Instruction>()
-            {
-                new Instruction(BooleanConstantToStack, value)
-            };
-            var actual = ExecuteBooleanFunction(inst);
-            Assert.Equal(value, actual);
-        }
-
         [Theory]
         [InlineData(0, 1)]
         [InlineData(1, 2)]
@@ -139,7 +109,7 @@ namespace ArborateVirtualMachine.Test
 
         [Theory]
         [InlineData(BooleanConstantToStack)]
-        public void InstructionWithInvalidBooleanDataThrows(InstructionCode instructionCode)
+        public void InstructionRequiringBooleanWithInvalidDataThrows(InstructionCode instructionCode)
         {
             var instructions = new List<Instruction>()
             {
@@ -151,5 +121,21 @@ namespace ArborateVirtualMachine.Test
 
             Assert.Equal(InvalidSourceDetail.InvalidInstructionData, exception.DetailCode);
         }
+
+        [Theory]
+        [InlineData(BooleanEqual)]
+        public void InstructionWithUnnecessaryDataThrows(InstructionCode instructionCode)
+        {
+            var instructions = new List<Instruction>()
+            {
+                new Instruction(instructionCode, 0L)
+            };
+
+            var functionDefinition = new FunctionDefinition(instructions, new List<VmType>(), new List<VmType>() { VmType.Boolean }, 0);
+            var exception = Assert.Throws<InvalidSourceException>(() => new VirtualMachine(functionDefinition));
+
+            Assert.Equal(InvalidSourceDetail.InstructionCodeDoesNotUseData, exception.DetailCode);
+        }
+
     }
 }

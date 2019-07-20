@@ -44,6 +44,17 @@ namespace ArborateVirtualMachine
                         throw new InvalidSourceException(InvalidInstructionData);
                     }
                     break;
+
+                // should be moved to appropriate section when tests for the below codes are added.
+                case IntegerConstantToStack:
+                    break;
+
+                default:
+                    if (instruction.Data != null)
+                    {
+                        throw new InvalidSourceException(InstructionCodeDoesNotUseData);
+                    }
+                    break;
             }
         }
 
@@ -69,6 +80,15 @@ namespace ArborateVirtualMachine
                             bool data = (bool)currentInstruction.Data;
                             var value = new VmBoolean(data);
                             stack.Push(value);
+                        }
+                        break;
+
+                    case BooleanEqual:
+                        {
+                            bool val2 = PopBoolean(stack).Val;
+                            bool val1 = PopBoolean(stack).Val;
+                            var result = val1 == val2;
+                            stack.Push(new VmBoolean(result));
                         }
                         break;
 
@@ -100,6 +120,21 @@ namespace ArborateVirtualMachine
             }
 
             return stack.Pop();
+        }
+
+        private VmBoolean PopBoolean(Stack<VmValue> stack)
+        {
+            if (stack.Count == 0)
+            {
+                throw new InvalidSourceException(TooFewElementsOnStack);
+            }
+
+            var poppedVal = stack.Pop();
+            if (!(poppedVal is VmBoolean))
+            {
+                throw new InvalidSourceException(IncorrectElementTypeOnStack);
+            }
+            return (VmBoolean)poppedVal;
         }
     }
 }

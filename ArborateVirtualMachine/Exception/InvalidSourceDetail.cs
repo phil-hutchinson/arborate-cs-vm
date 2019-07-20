@@ -9,5 +9,8 @@
         InvalidInstruction,
         MissingInstructionData,
         InvalidInstructionData,
+        InstructionCodeDoesNotUseData,
+        IncorrectElementTypeOnStack,
+        TooFewElementsOnStack,
     }
 }
