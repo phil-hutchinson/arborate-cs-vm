@@ -57,6 +57,23 @@ namespace ArborateVirtualMachine.Test.Boolean
             var actual = ExecuteBooleanFunction(inst);
             Assert.Equal(expected, actual);
         }
+
+        [Theory]
+        [InlineData(false, false, false)]
+        [InlineData(false, true, false)]
+        [InlineData(true, false, false)]
+        [InlineData(true, true, true)]
+        public void BooleanAndExecutesCorrectly(bool val1, bool val2, bool expected)
+        {
+            var inst = new List<Instruction>()
+            {
+                new Instruction(BooleanConstantToStack, val1),
+                new Instruction(BooleanConstantToStack, val2),
+                new Instruction(BooleanAnd)
+            };
+            var actual = ExecuteBooleanFunction(inst);
+            Assert.Equal(expected, actual);
+        }
         #endregion
 
         #region ThrownExceptions
@@ -67,6 +84,9 @@ namespace ArborateVirtualMachine.Test.Boolean
         [InlineData(VmType.Integer, VmType.Boolean, BooleanNotEqual)]
         [InlineData(VmType.Boolean, VmType.Integer, BooleanNotEqual)]
         [InlineData(VmType.Integer, VmType.Integer, BooleanNotEqual)]
+        [InlineData(VmType.Integer, VmType.Boolean, BooleanAnd)]
+        [InlineData(VmType.Boolean, VmType.Integer, BooleanAnd)]
+        [InlineData(VmType.Integer, VmType.Integer, BooleanAnd)]
         public void BinaryInstructionWithIncorrectTypesOnStackThrows(VmType type1, VmType type2, InstructionCode instructionCode)
         {
             var instructions = new List<Instruction>()
@@ -85,6 +105,8 @@ namespace ArborateVirtualMachine.Test.Boolean
         [InlineData(1, BooleanEqual)]
         [InlineData(0, BooleanNotEqual)]
         [InlineData(1, BooleanNotEqual)]
+        [InlineData(0, BooleanAnd)]
+        [InlineData(1, BooleanAnd)]
         public void BooleanInstructionRequiringMoreElementsThanOnStackThrows(int numberOfValuesOnStack, InstructionCode instructionCode)
         {
             var instructions = new List<Instruction>();
