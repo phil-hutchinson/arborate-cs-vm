@@ -119,6 +119,14 @@ namespace ArborateVirtualMachine
                         }
                         break;
 
+                    case BooleanNot:
+                        {
+                            bool val = PopBoolean(stack).Val;
+                            var result = !val;
+                            stack.Push(new VmBoolean(result));
+                        }
+                        break;
+
                     case IntegerConstantToStack:
                         {
                             long data = (long)currentInstruction.Data;

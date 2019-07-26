@@ -91,9 +91,37 @@ namespace ArborateVirtualMachine.Test.Boolean
             var actual = ExecuteBooleanFunction(inst);
             Assert.Equal(expected, actual);
         }
+
+        [Theory]
+        [InlineData(false, true)]
+        [InlineData(true, false)]
+        public void BooleanNotExecutesCorrectly(bool val, bool expected)
+        {
+            var inst = new List<Instruction>()
+            {
+                new Instruction(BooleanConstantToStack, val),
+                new Instruction(BooleanNot)
+            };
+            var actual = ExecuteBooleanFunction(inst);
+            Assert.Equal(expected, actual);
+        }
         #endregion
 
         #region ThrownExceptions
+        [Theory]
+        [InlineData(VmType.Integer, BooleanNot)]
+        public void UnaryInstructionWithIncorrectTypesOnStackThrows(VmType type, InstructionCode instructionCode)
+        {
+            var instructions = new List<Instruction>()
+            {
+                BuildConstantToStackInstruction(type),
+                new Instruction(instructionCode)
+            };
+            var exception = Assert.Throws<InvalidSourceException>(() => ExecuteBooleanFunction(instructions));
+
+            Assert.Equal(InvalidSourceDetail.IncorrectElementTypeOnStack, exception.DetailCode);
+        }
+
         [Theory]
         [InlineData(VmType.Integer, VmType.Boolean, BooleanEqual)]
         [InlineData(VmType.Boolean, VmType.Integer, BooleanEqual)]
@@ -129,6 +157,7 @@ namespace ArborateVirtualMachine.Test.Boolean
         [InlineData(1, BooleanAnd)]
         [InlineData(0, BooleanOr)]
         [InlineData(1, BooleanOr)]
+        [InlineData(0, BooleanNot)]
         public void BooleanInstructionRequiringMoreElementsThanOnStackThrows(int numberOfValuesOnStack, InstructionCode instructionCode)
         {
             var instructions = new List<Instruction>();
