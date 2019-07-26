@@ -26,7 +26,6 @@ namespace ArborateVirtualMachine.Entity
         BooleanAnd = 0x0103,
         BooleanOr = 0x0107,
         BooleanNot = 0x0108,
-        BooleanXor = 0x0109,
 
         // integer operations
         IntegerConstantToStack = 0x0500,
