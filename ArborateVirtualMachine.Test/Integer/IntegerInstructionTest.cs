@@ -58,6 +58,24 @@ namespace ArborateVirtualMachine.Test.Integer
             var actual = ExecuteBooleanFunction(inst);
             Assert.Equal(expected, actual);
         }
+
+        [Theory]
+        [InlineData(12, 5, 17)]
+        [InlineData(0, -6, -6)]
+        [InlineData(4, -19, -15)]
+        [InlineData(-10, 10, 0)]
+        public void IntegerAddExecutesCorrectly(long val1, long val2, long expected)
+        {
+            var inst = new List<Instruction>()
+            {
+                new Instruction(IntegerConstantToStack, val1),
+                new Instruction(IntegerConstantToStack, val2),
+                new Instruction(IntegerAdd)
+            };
+            var actual = ExecuteIntegerFunction(inst);
+            Assert.Equal(expected, actual);
+        }
+
         #endregion
 
         #region ThrownExceptions
@@ -68,6 +86,9 @@ namespace ArborateVirtualMachine.Test.Integer
         [InlineData(VmType.Boolean, VmType.Integer, IntegerNotEqual)]
         [InlineData(VmType.Integer, VmType.Boolean, IntegerNotEqual)]
         [InlineData(VmType.Boolean, VmType.Boolean, IntegerNotEqual)]
+        [InlineData(VmType.Boolean, VmType.Integer, IntegerAdd)]
+        [InlineData(VmType.Integer, VmType.Boolean, IntegerAdd)]
+        [InlineData(VmType.Boolean, VmType.Boolean, IntegerAdd)]
         public void BinaryInstructionWithIncorrectTypesOnStackThrows(VmType type1, VmType type2, InstructionCode instructionCode)
         {
             var instructions = new List<Instruction>()
@@ -86,6 +107,8 @@ namespace ArborateVirtualMachine.Test.Integer
         [InlineData(1, IntegerEqual)]
         [InlineData(0, IntegerNotEqual)]
         [InlineData(1, IntegerNotEqual)]
+        [InlineData(0, IntegerAdd)]
+        [InlineData(1, IntegerAdd)]
         public void BooleanInstructionRequiringMoreElementsThanOnStackThrows(int numberOfValuesOnStack, InstructionCode instructionCode)
         {
             var instructions = new List<Instruction>();
