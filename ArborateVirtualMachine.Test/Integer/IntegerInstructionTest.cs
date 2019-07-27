@@ -138,6 +138,31 @@ namespace ArborateVirtualMachine.Test.Integer
             var actual = ExecuteIntegerFunction(inst);
             Assert.Equal(expected, actual);
         }
+
+        [Theory]
+        [InlineData(26L, 2L, 0L)]
+        [InlineData(33L, -11L, 0L)]
+        [InlineData(-200L, 10L, 0L)]
+        [InlineData(-123L, -123L, 0L)]
+        [InlineData(41L, 5L, 1L)]
+        [InlineData(13L, -5L, 3L)]
+        [InlineData(-59L, 10L, -9L)]
+        [InlineData(-61L, -7L, -5L)]
+        [InlineData(-6L, 23L, -6L)]
+        [InlineData(0L, -1L, 0L)]
+        [InlineData(10L, 0L, 0L)]
+        [InlineData(0L, 0L, 0L)]
+        public void IntegerModulusExecutesCorrectly(long val1, long val2, long expected)
+        {
+            var inst = new List<Instruction>()
+            {
+                new Instruction(IntegerConstantToStack, val1),
+                new Instruction(IntegerConstantToStack, val2),
+                new Instruction(IntegerModulus)
+            };
+            var actual = ExecuteIntegerFunction(inst);
+            Assert.Equal(expected, actual);
+        }
         #endregion
 
         #region ThrownExceptions
@@ -160,6 +185,9 @@ namespace ArborateVirtualMachine.Test.Integer
         [InlineData(VmType.Boolean, VmType.Integer, IntegerDivide)]
         [InlineData(VmType.Integer, VmType.Boolean, IntegerDivide)]
         [InlineData(VmType.Boolean, VmType.Boolean, IntegerDivide)]
+        [InlineData(VmType.Boolean, VmType.Integer, IntegerModulus)]
+        [InlineData(VmType.Integer, VmType.Boolean, IntegerModulus)]
+        [InlineData(VmType.Boolean, VmType.Boolean, IntegerModulus)]
         public void BinaryInstructionWithIncorrectTypesOnStackThrows(VmType type1, VmType type2, InstructionCode instructionCode)
         {
             var instructions = new List<Instruction>()
@@ -186,6 +214,8 @@ namespace ArborateVirtualMachine.Test.Integer
         [InlineData(1, IntegerMultiply)]
         [InlineData(0, IntegerDivide)]
         [InlineData(1, IntegerDivide)]
+        [InlineData(0, IntegerModulus)]
+        [InlineData(1, IntegerModulus)]
         public void BooleanInstructionRequiringMoreElementsThanOnStackThrows(int numberOfValuesOnStack, InstructionCode instructionCode)
         {
             var instructions = new List<Instruction>();

@@ -149,6 +149,7 @@ namespace ArborateVirtualMachine.Test
         [InlineData(IntegerSubtract)]
         [InlineData(IntegerMultiply)]
         [InlineData(IntegerDivide)]
+        [InlineData(IntegerModulus)]
         public void InstructionWithUnnecessaryDataThrows(InstructionCode instructionCode)
         {
             var instructions = new List<Instruction>()
