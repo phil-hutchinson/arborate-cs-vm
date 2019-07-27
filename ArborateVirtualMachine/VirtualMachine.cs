@@ -141,6 +141,16 @@ namespace ArborateVirtualMachine
                             stack.Push(value);
                         }
                         break;
+
+                    case IntegerEqual:
+                        {
+                            long val2 = PopInteger(stack).Val;
+                            long val1 = PopInteger(stack).Val;
+                            var result = val1 == val2;
+                            stack.Push(new VmBoolean(result));
+                        }
+                        break;
+
                 }
 
                 instructionNumber = nextInstructionNumber;
@@ -177,6 +187,21 @@ namespace ArborateVirtualMachine
                 throw new InvalidSourceException(IncorrectElementTypeOnStack);
             }
             return (VmBoolean)poppedVal;
+        }
+
+        private VmInteger PopInteger(Stack<VmValue> stack)
+        {
+            if (stack.Count == 0)
+            {
+                throw new InvalidSourceException(TooFewElementsOnStack);
+            }
+
+            var poppedVal = stack.Pop();
+            if (!(poppedVal is VmInteger))
+            {
+                throw new InvalidSourceException(IncorrectElementTypeOnStack);
+            }
+            return (VmInteger)poppedVal;
         }
     }
 }
