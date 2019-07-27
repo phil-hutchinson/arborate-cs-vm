@@ -187,6 +187,14 @@ namespace ArborateVirtualMachine
                         }
                         break;
 
+                    case IntegerDivide:
+                        {
+                            long val2 = PopInteger(stack).Val;
+                            long val1 = PopInteger(stack).Val;
+                            var result = (val2 == 0L) ? 0L : val1 / val2;
+                            stack.Push(new VmInteger(result));
+                        }
+                        break;
                 }
 
                 instructionNumber = nextInstructionNumber;
