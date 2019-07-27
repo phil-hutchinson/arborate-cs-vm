@@ -39,14 +39,21 @@ namespace ArborateVirtualMachine
                     {
                         throw new InvalidSourceException(MissingInstructionData);
                     }
-                    if (!(instruction.Data is Boolean))
+                    if (!(instruction.Data is bool))
                     {
                         throw new InvalidSourceException(InvalidInstructionData);
                     }
                     break;
 
-                // should be moved to appropriate section when tests for the below codes are added.
                 case IntegerConstantToStack:
+                    if (instruction.Data == null)
+                    {
+                        throw new InvalidSourceException(MissingInstructionData);
+                    }
+                    if (!(instruction.Data is long))
+                    {
+                        throw new InvalidSourceException(InvalidInstructionData);
+                    }
                     break;
 
                 default:

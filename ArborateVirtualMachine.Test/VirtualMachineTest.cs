@@ -94,6 +94,7 @@ namespace ArborateVirtualMachine.Test
 
         [Theory]
         [InlineData(BooleanConstantToStack)]
+        [InlineData(IntegerConstantToStack)]
         public void InstructionMissingRequiredDataThrows(InstructionCode instructionCode)
         {
             var instructions = new List<Instruction>()
@@ -108,13 +109,27 @@ namespace ArborateVirtualMachine.Test
         }
 
         [Theory]
-        [InlineData(BooleanConstantToStack)]
-        public void InstructionRequiringBooleanWithInvalidDataThrows(InstructionCode instructionCode)
+        [InlineData(BooleanConstantToStack, VmType.Integer)]
+        [InlineData(IntegerConstantToStack, VmType.Boolean)]
+        public void InstructionRequiringBooleanWithInvalidDataThrows(InstructionCode instructionCode, VmType vmType)
         {
-            var instructions = new List<Instruction>()
+
+            var instructions = new List<Instruction>();
+
+            switch(vmType)
             {
-                new Instruction(instructionCode, 0L)
-            };
+                case VmType.Integer:
+                    instructions.Add(new Instruction(instructionCode, 0L));
+                    break;
+
+                case VmType.Boolean:
+                    instructions.Add(new Instruction(instructionCode, true));
+                    break;
+
+                default:
+                    Assert.True(false); // error in test;
+                    break;
+            }
 
             var functionDefinition = new FunctionDefinition(instructions, new List<VmType>(), new List<VmType>() { VmType.Boolean }, 0);
             var exception = Assert.Throws<InvalidSourceException>(() => new VirtualMachine(functionDefinition));

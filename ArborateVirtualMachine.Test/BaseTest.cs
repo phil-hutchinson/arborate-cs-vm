@@ -27,6 +27,12 @@ namespace ArborateVirtualMachine.Test
             return ((VmBoolean)executionResult.Single()).Val;
         }
 
+        protected long ExecuteIntegerFunction(IEnumerable<Instruction> instructions)
+        {
+            var executionResult = ExecuteFunction(instructions, outParams: new List<VmType> { VmType.Integer });
+            return ((VmInteger)executionResult.Single()).Val;
+        }
+
         protected Instruction BuildConstantToStackInstruction(VmType dataType)
         {
             switch(dataType)
