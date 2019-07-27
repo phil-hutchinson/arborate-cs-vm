@@ -144,6 +144,7 @@ namespace ArborateVirtualMachine.Test
         [InlineData(BooleanOr)]
         [InlineData(BooleanNot)]
         [InlineData(IntegerEqual)]
+        [InlineData(IntegerNotEqual)]
         public void InstructionWithUnnecessaryDataThrows(InstructionCode instructionCode)
         {
             var instructions = new List<Instruction>()

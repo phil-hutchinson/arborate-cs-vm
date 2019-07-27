@@ -151,6 +151,15 @@ namespace ArborateVirtualMachine
                         }
                         break;
 
+                    case IntegerNotEqual:
+                        {
+                            long val2 = PopInteger(stack).Val;
+                            long val1 = PopInteger(stack).Val;
+                            var result = val1 != val2;
+                            stack.Push(new VmBoolean(result));
+                        }
+                        break;
+
                 }
 
                 instructionNumber = nextInstructionNumber;
