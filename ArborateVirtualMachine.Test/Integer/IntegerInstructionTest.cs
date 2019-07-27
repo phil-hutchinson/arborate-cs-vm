@@ -60,10 +60,10 @@ namespace ArborateVirtualMachine.Test.Integer
         }
 
         [Theory]
-        [InlineData(12, 5, 17)]
-        [InlineData(0, -6, -6)]
-        [InlineData(4, -19, -15)]
-        [InlineData(-10, 10, 0)]
+        [InlineData(12L, 5L, 17L)]
+        [InlineData(0L, -6L, -6L)]
+        [InlineData(4L, -19L, -15L)]
+        [InlineData(-10L, 10L, 0L)]
         public void IntegerAddExecutesCorrectly(long val1, long val2, long expected)
         {
             var inst = new List<Instruction>()
@@ -77,12 +77,12 @@ namespace ArborateVirtualMachine.Test.Integer
         }
 
         [Theory]
-        [InlineData(8, 5, 3)]
-        [InlineData(0, -9, 9)]
-        [InlineData(-15, 25, -40)]
-        [InlineData(-15, -25, 10)]
-        [InlineData(10, 10, 0)]
-        [InlineData(6, 0, 6)]
+        [InlineData(8L, 5L, 3L)]
+        [InlineData(0L, -9L, 9L)]
+        [InlineData(-15L, 25L, -40L)]
+        [InlineData(-15L, -25L, 10L)]
+        [InlineData(10L, 10L, 0L)]
+        [InlineData(6L, 0L, 6L)]
         public void IntegerSubtractExecutesCorrectly(long val1, long val2, long expected)
         {
             var inst = new List<Instruction>()
@@ -95,6 +95,24 @@ namespace ArborateVirtualMachine.Test.Integer
             Assert.Equal(expected, actual);
         }
 
+        [Theory]
+        [InlineData(7L, 12L, 84L)]
+        [InlineData(33L, -6L, -198L)]
+        [InlineData(-7L, 7L, -49L)]
+        [InlineData(-100L, -100L, 10000L)]
+        [InlineData(0L, -15L, 0L)]
+        [InlineData(10L, 0L, 0L)]
+        public void IntegerMultiplyExecutesCorrectly(long val1, long val2, long expected)
+        {
+            var inst = new List<Instruction>()
+            {
+                new Instruction(IntegerConstantToStack, val1),
+                new Instruction(IntegerConstantToStack, val2),
+                new Instruction(IntegerMultiply)
+            };
+            var actual = ExecuteIntegerFunction(inst);
+            Assert.Equal(expected, actual);
+        }
         #endregion
 
         #region ThrownExceptions
@@ -111,6 +129,9 @@ namespace ArborateVirtualMachine.Test.Integer
         [InlineData(VmType.Boolean, VmType.Integer, IntegerSubtract)]
         [InlineData(VmType.Integer, VmType.Boolean, IntegerSubtract)]
         [InlineData(VmType.Boolean, VmType.Boolean, IntegerSubtract)]
+        [InlineData(VmType.Boolean, VmType.Integer, IntegerMultiply)]
+        [InlineData(VmType.Integer, VmType.Boolean, IntegerMultiply)]
+        [InlineData(VmType.Boolean, VmType.Boolean, IntegerMultiply)]
         public void BinaryInstructionWithIncorrectTypesOnStackThrows(VmType type1, VmType type2, InstructionCode instructionCode)
         {
             var instructions = new List<Instruction>()
@@ -133,6 +154,8 @@ namespace ArborateVirtualMachine.Test.Integer
         [InlineData(1, IntegerAdd)]
         [InlineData(0, IntegerSubtract)]
         [InlineData(1, IntegerSubtract)]
+        [InlineData(0, IntegerMultiply)]
+        [InlineData(1, IntegerMultiply)]
         public void BooleanInstructionRequiringMoreElementsThanOnStackThrows(int numberOfValuesOnStack, InstructionCode instructionCode)
         {
             var instructions = new List<Instruction>();
