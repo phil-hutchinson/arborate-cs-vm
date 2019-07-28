@@ -1,11 +1,11 @@
-﻿using ArborateVirtualMachine.Entity;
-using ArborateVirtualMachine.Exception;
-using static ArborateVirtualMachine.Entity.InstructionCode;
-using static ArborateVirtualMachine.Exception.InvalidSourceDetail;
+﻿using Arborate.Runtime.Entity;
+using Arborate.Runtime.Exception;
+using static Arborate.Runtime.Entity.InstructionCode;
+using static Arborate.Runtime.Exception.InvalidSourceDetail;
 using System;
 using System.Collections.Generic;
 
-namespace ArborateVirtualMachine
+namespace Arborate.Runtime
 {
     public class VirtualMachine
     {

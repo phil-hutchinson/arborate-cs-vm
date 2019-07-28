@@ -1,12 +1,12 @@
-using ArborateVirtualMachine.Entity;
-using static ArborateVirtualMachine.Entity.InstructionCode;
+using Arborate.Runtime.Entity;
+using static Arborate.Runtime.Entity.InstructionCode;
 using System;
 using System.Collections.Generic;
 using Xunit;
-using ArborateVirtualMachine.Exception;
+using Arborate.Runtime.Exception;
 using System.Linq;
 
-namespace ArborateVirtualMachine.Test
+namespace Arborate.Runtime.Test
 {
     public class VirtualMachineTest: BaseTest
     {

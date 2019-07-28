@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace ArborateVirtualMachine.Entity
+namespace Arborate.Runtime.Entity
 {
     public abstract class VmValue
     {

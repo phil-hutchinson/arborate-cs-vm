@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace ArborateVirtualMachine.Exception
+namespace Arborate.Runtime.Exception
 {
     public class InvalidSourceException: System.Exception
     {

@@ -1,4 +1,4 @@
-﻿namespace ArborateVirtualMachine.Exception
+﻿namespace Arborate.Runtime.Exception
 {
     public enum InvalidSourceDetail
     {

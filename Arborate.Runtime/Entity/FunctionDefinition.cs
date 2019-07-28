@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace ArborateVirtualMachine.Entity
+namespace Arborate.Runtime.Entity
 {
     public class FunctionDefinition
     {

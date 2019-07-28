@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29009.5
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Arborate.Runtime", "ArborateVirtualMachine\Arborate.Runtime.csproj", "{8CA26B24-2BC3-4451-BF69-C87800FE093C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Arborate.Runtime", "Arborate.Runtime\Arborate.Runtime.csproj", "{8CA26B24-2BC3-4451-BF69-C87800FE093C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Arborate.Runtime.Test", "ArborateVirtualMachine.Test\Arborate.Runtime.Test.csproj", "{626DEEB7-56B3-4EF7-B9EE-795649851541}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Arborate.Runtime.Test", "Arborate.Runtime.Test\Arborate.Runtime.Test.csproj", "{626DEEB7-56B3-4EF7-B9EE-795649851541}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
