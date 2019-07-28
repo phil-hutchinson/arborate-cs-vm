@@ -216,7 +216,7 @@ namespace ArborateVirtualMachine.Test.Integer
         [InlineData(1, IntegerDivide)]
         [InlineData(0, IntegerModulus)]
         [InlineData(1, IntegerModulus)]
-        public void BooleanInstructionRequiringMoreElementsThanOnStackThrows(int numberOfValuesOnStack, InstructionCode instructionCode)
+        public void IntegerInstructionRequiringMoreElementsThanOnStackThrows(int numberOfValuesOnStack, InstructionCode instructionCode)
         {
             var instructions = new List<Instruction>();
 
