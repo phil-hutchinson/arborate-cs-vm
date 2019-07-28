@@ -12,5 +12,6 @@
         InstructionCodeDoesNotUseData,
         IncorrectElementTypeOnStack,
         TooFewElementsOnStack,
+        InvalidBranchDestination,
     }
 }

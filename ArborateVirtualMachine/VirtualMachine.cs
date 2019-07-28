@@ -15,9 +15,11 @@ namespace ArborateVirtualMachine
         {
             Definition = definition;
 
-            foreach(var instruction in Definition.Code)
+            for(int i = 0; i < Definition.Code.Count; i++)
             {
+                var instruction = Definition.Code[i];
                 CheckInstruction(instruction);
+                CheckInstructionBranch(instruction, i, Definition.Code.Count);
             }
 
             if (definition.OutParams.Count == 0)
@@ -46,6 +48,7 @@ namespace ArborateVirtualMachine
                     break;
 
                 case IntegerConstantToStack:
+                case Branch:
                     if (instruction.Data == null)
                     {
                         throw new InvalidSourceException(MissingInstructionData);
@@ -60,6 +63,20 @@ namespace ArborateVirtualMachine
                     if (instruction.Data != null)
                     {
                         throw new InvalidSourceException(InstructionCodeDoesNotUseData);
+                    }
+                    break;
+            }
+        }
+
+        private void CheckInstructionBranch(Instruction instruction, int instructionPosition, int totalInstructions)
+        {
+            switch (instruction.InstructionCode)
+            {
+                case Branch:
+                    long branchTo = (long)instruction.Data;
+                    if (branchTo < 0 || branchTo == instructionPosition || branchTo >= totalInstructions)
+                    {
+                        throw new InvalidSourceException(InvalidBranchDestination);
                     }
                     break;
             }
@@ -82,6 +99,13 @@ namespace ArborateVirtualMachine
 
                 switch(currentInstruction.InstructionCode)
                 {
+                    case Branch:
+                        {
+                            long branchTo = (long)currentInstruction.Data;
+                            nextInstructionNumber = (int)branchTo;
+                        }
+                        break;
+
                     case BooleanConstantToStack:
                         {
                             bool data = (bool)currentInstruction.Data;
