@@ -13,7 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ArborateVirtualMachine\ArborateVirtualMachine.csproj" />
+    <ProjectReference Include="..\ArborateVirtualMachine\Arborate.Runtime.csproj" />
   </ItemGroup>
 
 </Project>
