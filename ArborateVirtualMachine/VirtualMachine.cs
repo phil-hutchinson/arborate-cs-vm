@@ -50,6 +50,7 @@ namespace ArborateVirtualMachine
                 case IntegerConstantToStack:
                 case Branch:
                 case BranchTrue:
+                case BranchFalse:
                     if (instruction.Data == null)
                     {
                         throw new InvalidSourceException(MissingInstructionData);
@@ -75,6 +76,7 @@ namespace ArborateVirtualMachine
             {
                 case Branch:
                 case BranchTrue:
+                case BranchFalse:
                     long branchTo = (long)instruction.Data;
                     if (branchTo < 0 || branchTo == instructionPosition || branchTo >= totalInstructions)
                     {
@@ -113,6 +115,17 @@ namespace ArborateVirtualMachine
                             long branchTo = (long)currentInstruction.Data;
                             bool checkVal = PopBoolean(stack).Val;
                             if (checkVal)
+                            {
+                                nextInstructionNumber = (int)branchTo;
+                            }
+                        }
+                        break;
+
+                    case BranchFalse:
+                        {
+                            long branchTo = (long)currentInstruction.Data;
+                            bool checkVal = PopBoolean(stack).Val;
+                            if (!checkVal)
                             {
                                 nextInstructionNumber = (int)branchTo;
                             }

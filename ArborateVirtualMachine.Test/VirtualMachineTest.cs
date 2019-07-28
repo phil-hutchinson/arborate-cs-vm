@@ -97,6 +97,7 @@ namespace ArborateVirtualMachine.Test
         [InlineData(IntegerConstantToStack)]
         [InlineData(Branch)]
         [InlineData(BranchTrue)]
+        [InlineData(BranchFalse)]
         public void InstructionMissingRequiredDataThrows(InstructionCode instructionCode)
         {
             var instructions = new List<Instruction>()
@@ -115,6 +116,7 @@ namespace ArborateVirtualMachine.Test
         [InlineData(IntegerConstantToStack, VmType.Boolean)]
         [InlineData(Branch, VmType.Boolean)]
         [InlineData(BranchTrue, VmType.Boolean)]
+        [InlineData(BranchFalse, VmType.Boolean)]
         public void InstructionRequiringDataWithInvalidTypeThrows(InstructionCode instructionCode, VmType vmType)
         {
 

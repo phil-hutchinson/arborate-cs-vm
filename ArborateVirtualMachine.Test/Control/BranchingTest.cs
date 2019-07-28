@@ -54,11 +54,32 @@ namespace ArborateVirtualMachine.Test.Control
             var actual = ExecuteIntegerFunction(inst);
             Assert.Equal(expected, actual);
         }
+
+        [Theory]
+        [InlineData(false, 21L)]
+        [InlineData(true, 105L)]
+        public void BranchFalseExecutesCorrectly(bool checkValue, long expected)
+        {
+            var inst = new List<Instruction>()
+            {
+                new Instruction(IntegerConstantToStack, 3L),
+                new Instruction(BooleanConstantToStack, checkValue),
+                new Instruction(BranchFalse, 5L),
+                new Instruction(IntegerConstantToStack, 5L),
+                new Instruction(IntegerMultiply),
+                new Instruction(IntegerConstantToStack, 7L),
+                new Instruction(IntegerMultiply),
+            };
+
+            var actual = ExecuteIntegerFunction(inst);
+            Assert.Equal(expected, actual);
+        }
         #endregion
 
         #region ThrownExceptions
         [Theory]
         [InlineData(VmType.Integer, BranchTrue)]
+        [InlineData(VmType.Integer, BranchFalse)]
         public void ConditionalBranchingWithIncorrectTypesOnStackThrows(VmType type, InstructionCode instructionCode)
         {
             var instructions = new List<Instruction>()
@@ -73,6 +94,7 @@ namespace ArborateVirtualMachine.Test.Control
 
         [Theory]
         [InlineData(0, BranchTrue)]
+        [InlineData(0, BranchFalse)]
         public void ConditionalBranchingRequiringMoreElementsThanOnStackThrows(int numberOfValuesOnStack, InstructionCode instructionCode)
         {
             var instructions = new List<Instruction>()
@@ -99,6 +121,9 @@ namespace ArborateVirtualMachine.Test.Control
         [InlineData(BranchTrue, -1)]
         [InlineData(BranchTrue, 2)]
         [InlineData(BranchTrue, 4)]
+        [InlineData(BranchFalse, -1)]
+        [InlineData(BranchFalse, 2)]
+        [InlineData(BranchFalse, 4)]
         public void BranchingOutOfRangeThrows(InstructionCode instructionCode, long destinationLineNumber)
         {
             var instructions = new List<Instruction>()
