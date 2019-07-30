@@ -21,15 +21,15 @@ namespace Arborate.Runtime.Test
             //yield return executionResult; // can remove the yield when vm returns multiple types properly
         }
 
-        protected bool ExecuteBooleanFunction(IEnumerable<Instruction> instructions)
+        protected bool ExecuteBooleanFunction(IEnumerable<Instruction> instructions, int varCount = 0)
         {
-            var executionResult = ExecuteFunction(instructions, outParams: new List<VmType> { VmType.Boolean });
+            var executionResult = ExecuteFunction(instructions, outParams: new List<VmType> { VmType.Boolean }, varCount: varCount);
             return ((VmBoolean)executionResult.Single()).Val;
         }
 
-        protected long ExecuteIntegerFunction(IEnumerable<Instruction> instructions)
+        protected long ExecuteIntegerFunction(IEnumerable<Instruction> instructions, int varCount = 0)
         {
-            var executionResult = ExecuteFunction(instructions, outParams: new List<VmType> { VmType.Integer });
+            var executionResult = ExecuteFunction(instructions, outParams: new List<VmType> { VmType.Integer }, varCount: varCount);
             return ((VmInteger)executionResult.Single()).Val;
         }
 

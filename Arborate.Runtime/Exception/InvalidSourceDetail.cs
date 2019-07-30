@@ -13,5 +13,6 @@
         IncorrectElementTypeOnStack,
         TooFewElementsOnStack,
         InvalidBranchDestination,
+        InvalidVariableIndex,
     }
 }

@@ -4,6 +4,7 @@ using static Arborate.Runtime.Entity.InstructionCode;
 using static Arborate.Runtime.Exception.InvalidSourceDetail;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Arborate.Runtime
 {
@@ -20,6 +21,7 @@ namespace Arborate.Runtime
                 var instruction = Definition.Code[i];
                 CheckInstruction(instruction);
                 CheckInstructionBranch(instruction, i, Definition.Code.Count);
+                CheckInstructionVariable(instruction, Definition.VarCount);
             }
 
             if (definition.OutParams.Count == 0)
@@ -47,6 +49,7 @@ namespace Arborate.Runtime
                     }
                     break;
 
+                case StackToVariable:
                 case IntegerConstantToStack:
                 case Branch:
                 case BranchTrue:
@@ -86,6 +89,20 @@ namespace Arborate.Runtime
             }
         }
 
+        private void CheckInstructionVariable(Instruction instruction, int varCount)
+        {
+            switch (instruction.InstructionCode)
+            {
+                case StackToVariable:
+                    long variableIndex = (long)instruction.Data;
+                    if (variableIndex < 0 || variableIndex >= varCount)
+                    {
+                        throw new InvalidSourceException(InvalidVariableIndex);
+                    }
+                    break;
+            }
+        }
+
         public VmValue Execute()
         {
             return RunFunction(Definition);
@@ -94,6 +111,8 @@ namespace Arborate.Runtime
         private VmValue RunFunction(FunctionDefinition definition)
         {
             var stack = new Stack<VmValue>();
+            var localVariables = Enumerable.Repeat((VmValue)null, definition.VarCount).ToList();
+
             var instructionNumber = 0;
 
             while (instructionNumber < definition.Code.Count)
@@ -103,6 +122,14 @@ namespace Arborate.Runtime
 
                 switch(currentInstruction.InstructionCode)
                 {
+                    case StackToVariable:
+                        {
+                            long data = (long)currentInstruction.Data;
+                            var val = PopValue(stack);
+                            localVariables[(int)data] = val;
+                        }
+                        break;
+
                     case Branch:
                         {
                             long branchTo = (long)currentInstruction.Data;
@@ -305,6 +332,17 @@ namespace Arborate.Runtime
                 throw new InvalidSourceException(IncorrectElementTypeOnStack);
             }
             return (VmInteger)poppedVal;
+        }
+
+        private VmValue PopValue(Stack<VmValue> stack)
+        {
+            if (stack.Count == 0)
+            {
+                throw new InvalidSourceException(TooFewElementsOnStack);
+            }
+
+            var poppedVal = stack.Pop();
+            return (VmValue)poppedVal;
         }
     }
 }
