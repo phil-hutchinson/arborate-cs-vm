@@ -99,6 +99,7 @@ namespace Arborate.Runtime.Test
         [InlineData(BranchTrue)]
         [InlineData(BranchFalse)]
         [InlineData(StackToVariable)]
+        [InlineData(VariableToStack)]
         public void InstructionMissingRequiredDataThrows(InstructionCode instructionCode)
         {
             var instructions = new List<Instruction>()
@@ -119,6 +120,7 @@ namespace Arborate.Runtime.Test
         [InlineData(BranchTrue, VmType.Boolean)]
         [InlineData(BranchFalse, VmType.Boolean)]
         [InlineData(StackToVariable, VmType.Boolean)]
+        [InlineData(VariableToStack, VmType.Boolean)]
         public void InstructionRequiringDataWithInvalidTypeThrows(InstructionCode instructionCode, VmType vmType)
         {
 

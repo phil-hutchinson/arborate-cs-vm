@@ -9,7 +9,7 @@ namespace Arborate.Runtime.Test.Variable
 {
     public class VariableTest : BaseTest
     {
-        #region InstructionCodes
+            #region InstructionCodes
         [Theory]
         [InlineData(1L)]
         [InlineData(2L)]
@@ -31,6 +31,26 @@ namespace Arborate.Runtime.Test.Variable
 
             var actual = ExecuteIntegerFunction(instructions, varCount: 1);
             Assert.Equal(repetitions, actual);
+        }
+
+        [Theory]
+        [InlineData(0L, 5L)]
+        [InlineData(1L, 10L)]
+        [InlineData(2L, 15L)]
+        public void VariableToStackExecutesCorrectly(long variablePos, long expected)
+        {
+            var instructions = new List<Instruction>()
+            {
+                new Instruction(IntegerConstantToStack, 5L),
+                new Instruction(StackToVariable, 0L),
+                new Instruction(IntegerConstantToStack, 10L),
+                new Instruction(StackToVariable, 1L),
+                new Instruction(IntegerConstantToStack, 15L),
+                new Instruction(StackToVariable, 2L),
+                new Instruction(VariableToStack, variablePos),
+            };
+            var actual = ExecuteIntegerFunction(instructions, varCount: 3);
+            Assert.Equal(expected, actual);
         }
         #endregion
 
@@ -56,6 +76,8 @@ namespace Arborate.Runtime.Test.Variable
         [Theory]
         [InlineData(StackToVariable, -1)]
         [InlineData(StackToVariable, 2)]
+        [InlineData(VariableToStack, -1)]
+        [InlineData(VariableToStack, 2)]
         public void VariableOperationOutOfRangeThrows(InstructionCode instructionCode, long variableIndex)
         {
             var instructions = new List<Instruction>()

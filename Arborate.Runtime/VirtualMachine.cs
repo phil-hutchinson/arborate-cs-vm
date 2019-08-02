@@ -50,6 +50,7 @@ namespace Arborate.Runtime
                     break;
 
                 case StackToVariable:
+                case VariableToStack:
                 case IntegerConstantToStack:
                 case Branch:
                 case BranchTrue:
@@ -94,6 +95,7 @@ namespace Arborate.Runtime
             switch (instruction.InstructionCode)
             {
                 case StackToVariable:
+                case VariableToStack:
                     long variableIndex = (long)instruction.Data;
                     if (variableIndex < 0 || variableIndex >= varCount)
                     {
@@ -127,6 +129,13 @@ namespace Arborate.Runtime
                             long data = (long)currentInstruction.Data;
                             var val = PopValue(stack);
                             localVariables[(int)data] = val;
+                        }
+                        break;
+
+                    case VariableToStack:
+                        {
+                            long data = (long)currentInstruction.Data;
+                            stack.Push(localVariables[(int)data]);
                         }
                         break;
 
