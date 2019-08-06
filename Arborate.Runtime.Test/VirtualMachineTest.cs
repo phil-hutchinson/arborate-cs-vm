@@ -77,6 +77,48 @@ namespace Arborate.Runtime.Test
         }
 
         [Theory]
+        [InlineData(null, 9L)]
+        [InlineData(0, 9L)]
+        [InlineData(1, 27L)]
+        public void VirtualMachineExecutesCorrectFunction(int? functionToExecute, long expected)
+        {
+            var functionDefinition1 = new FunctionDefinition(
+                new List<Instruction>()
+                {
+                    new Instruction(IntegerConstantToStack, 3L),
+                    new Instruction(IntegerConstantToStack, 3L),
+                    new Instruction(IntegerMultiply),
+                },
+                new List<VmType>(),
+                new List<VmType> { VmType.Integer },
+                1
+            );
+
+            var functionDefinition2 = new FunctionDefinition(
+                new List<Instruction>()
+                {
+                    new Instruction(IntegerConstantToStack, 3L),
+                    new Instruction(IntegerConstantToStack, 3L),
+                    new Instruction(IntegerMultiply),
+                    new Instruction(IntegerConstantToStack, 3L),
+                    new Instruction(IntegerMultiply),
+                },
+                new List<VmType>(),
+                new List<VmType> { VmType.Integer },
+                1
+            );
+
+            var vm = new VirtualMachine(functionDefinition1, functionDefinition2);
+
+            VmValue executionResult = vm.Execute(functionToExecute ?? 0);
+
+            long actual = ((VmInteger)executionResult).Val;
+
+            Assert.Equal(expected, actual);
+        }
+
+
+        [Theory]
         [InlineData(-1)]
         [InlineData(-2)]
         [InlineData(-3)]

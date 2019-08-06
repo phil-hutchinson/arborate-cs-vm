@@ -10,23 +10,27 @@ namespace Arborate.Runtime
 {
     public class VirtualMachine
     {
-        public FunctionDefinition Definition { get; }
+        public IList<FunctionDefinition> Definitions { get; }
 
-        public VirtualMachine(FunctionDefinition definition)
+        public VirtualMachine(params FunctionDefinition[] definitions)
         {
-            Definition = definition;
+            Definitions = definitions;
 
-            for(int i = 0; i < Definition.Code.Count; i++)
+            for (int funcIndex = 0; funcIndex < definitions.Length; funcIndex++)
             {
-                var instruction = Definition.Code[i];
-                CheckInstruction(instruction);
-                CheckInstructionBranch(instruction, i, Definition.Code.Count);
-                CheckInstructionVariable(instruction, Definition.VarCount);
-            }
+                FunctionDefinition currDef = definitions[funcIndex];
+                for (int i = 0; i < currDef.Code.Count; i++)
+                {
+                    var instruction = currDef.Code[i];
+                    CheckInstruction(instruction);
+                    CheckInstructionBranch(instruction, i, currDef.Code.Count);
+                    CheckInstructionVariable(instruction, currDef.VarCount);
+                }
 
-            if (definition.OutParams.Count == 0)
-            {
-                throw new InvalidSourceException(FunctionDefinitionMissingReturnValue);
+                if (currDef.OutParams.Count == 0)
+                {
+                    throw new InvalidSourceException(FunctionDefinitionMissingReturnValue);
+                }
             }
         }
 
@@ -105,9 +109,9 @@ namespace Arborate.Runtime
             }
         }
 
-        public VmValue Execute()
+        public VmValue Execute(int functionToExecute = 0)
         {
-            return RunFunction(Definition);
+            return RunFunction(Definitions[functionToExecute]);
         }
 
         private VmValue RunFunction(FunctionDefinition definition)
