@@ -91,7 +91,7 @@ namespace Arborate.Runtime.Test
                 },
                 new List<VmType>(),
                 new List<VmType> { VmType.Integer },
-                1
+                0
             );
 
             var functionDefinition2 = new FunctionDefinition(
@@ -105,7 +105,7 @@ namespace Arborate.Runtime.Test
                 },
                 new List<VmType>(),
                 new List<VmType> { VmType.Integer },
-                1
+                0
             );
 
             var vm = new VirtualMachine(functionDefinition1, functionDefinition2);
@@ -117,6 +117,133 @@ namespace Arborate.Runtime.Test
             Assert.Equal(expected, actual);
         }
 
+
+        [Theory]
+        [InlineData(5L, 25L)]
+        [InlineData(10L, 100L)]
+        public void VirtualMachineExecutesCallFunctionCorrectlyForOneParam(int paramValue, long expected)
+        {
+            var functionDefinition1 = new FunctionDefinition(
+                new List<Instruction>()
+                {
+                    new Instruction(IntegerConstantToStack, paramValue),
+                    new Instruction(CallFunction, 1L),
+                },
+                new List<VmType>(),
+                new List<VmType> { VmType.Integer },
+                0
+            );
+
+            var functionDefinition2 = new FunctionDefinition(
+                new List<Instruction>()
+                {
+                    new Instruction(StackToVariable, 0L),
+                    new Instruction(VariableToStack, 0L),
+                    new Instruction(VariableToStack, 0L),
+                    new Instruction(IntegerMultiply),
+                },
+                new List<VmType> { VmType.Integer },
+                new List<VmType> { VmType.Integer },
+                1
+            );
+
+            var vm = new VirtualMachine(functionDefinition1, functionDefinition2);
+
+            VmValue executionResult = vm.Execute();
+
+            long actual = ((VmInteger)executionResult).Val;
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Theory]
+        [InlineData(5L, 3L, 2L)]
+        [InlineData(10L, 18L, -8L)]
+        public void VirtualMachineExecutesCallFunctionCorrectlyForMultiParam(int paramValue1, int paramValue2, long expected)
+        {
+            var functionDefinition1 = new FunctionDefinition(
+                new List<Instruction>()
+                {
+                    new Instruction(IntegerConstantToStack, paramValue1),
+                    new Instruction(IntegerConstantToStack, paramValue2),
+                    new Instruction(CallFunction, 1L),
+                },
+                new List<VmType>(),
+                new List<VmType> { VmType.Integer },
+                0
+            );
+
+            var functionDefinition2 = new FunctionDefinition(
+                new List<Instruction>()
+                {
+                    new Instruction(IntegerSubtract),
+                },
+                new List<VmType> { VmType.Integer, VmType.Integer },
+                new List<VmType> { VmType.Integer },
+                0
+            );
+
+            var vm = new VirtualMachine(functionDefinition1, functionDefinition2);
+
+            VmValue executionResult = vm.Execute();
+
+            long actual = ((VmInteger)executionResult).Val;
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Theory]
+        [InlineData(5L, 0L, 1L)]
+        [InlineData(5L, 3L, 125L)]
+        [InlineData(2L, 10L, 1024L)]
+        public void VirtualMachineExecutesCallFunctionCorrectlyForRecursive(int paramValue1, int paramValue2, long expected)
+        {
+            var functionDefinition1 = new FunctionDefinition(
+                new List<Instruction>()
+                {
+                    new Instruction(IntegerConstantToStack, paramValue1),
+                    new Instruction(IntegerConstantToStack, paramValue2),
+                    new Instruction(CallFunction, 1L),
+                },
+                new List<VmType>(),
+                new List<VmType> { VmType.Integer },
+                0
+            );
+
+            var functionDefinition2 = new FunctionDefinition(
+                new List<Instruction>()
+                {
+                    new Instruction(StackToVariable, 1L),
+                    new Instruction(StackToVariable, 0L),
+                    new Instruction(VariableToStack, 1L),
+                    new Instruction(IntegerConstantToStack, 0L),
+                    new Instruction(IntegerEqual),
+                    new Instruction(BranchTrue, 14L),
+                    new Instruction(VariableToStack, 0L),
+                    new Instruction(VariableToStack, 1L),
+                    new Instruction(IntegerConstantToStack, 1L),
+                    new Instruction(IntegerSubtract),
+                    new Instruction(CallFunction, 1L),
+                    new Instruction(VariableToStack, 0L),
+                    new Instruction(IntegerMultiply),
+                    new Instruction(Branch, 15L),
+                    new Instruction(IntegerConstantToStack, 1L),
+                    new Instruction(IntegerConstantToStack, 1L), // this and next statement used as a NOP.
+                    new Instruction(IntegerMultiply),
+                },
+                new List<VmType> { VmType.Integer, VmType.Integer },
+                new List<VmType> { VmType.Integer },
+                2
+            );
+
+            var vm = new VirtualMachine(functionDefinition1, functionDefinition2);
+
+            VmValue executionResult = vm.Execute();
+
+            long actual = ((VmInteger)executionResult).Val;
+
+            Assert.Equal(expected, actual);
+        }
 
         [Theory]
         [InlineData(-1)]

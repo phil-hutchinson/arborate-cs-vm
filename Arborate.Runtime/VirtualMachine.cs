@@ -53,6 +53,7 @@ namespace Arborate.Runtime
                     }
                     break;
 
+                case CallFunction:
                 case StackToVariable:
                 case VariableToStack:
                 case IntegerConstantToStack:
@@ -111,12 +112,11 @@ namespace Arborate.Runtime
 
         public VmValue Execute(int functionToExecute = 0)
         {
-            return RunFunction(Definitions[functionToExecute]);
+            return RunFunction(Definitions[functionToExecute], new Stack<VmValue>());
         }
 
-        private VmValue RunFunction(FunctionDefinition definition)
+        private VmValue RunFunction(FunctionDefinition definition, Stack<VmValue> stack)
         {
-            var stack = new Stack<VmValue>();
             var localVariables = Enumerable.Repeat((VmValue)null, definition.VarCount).ToList();
 
             var instructionNumber = 0;
@@ -128,6 +128,14 @@ namespace Arborate.Runtime
 
                 switch(currentInstruction.InstructionCode)
                 {
+                    case CallFunction:
+                        {
+                            long data = (long)currentInstruction.Data;
+                            var val = RunFunction(Definitions[(int)data], stack);
+                            stack.Push(val);
+                        }
+                        break;
+
                     case StackToVariable:
                         {
                             long data = (long)currentInstruction.Data;
