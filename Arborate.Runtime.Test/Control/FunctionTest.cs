@@ -344,6 +344,58 @@ namespace Arborate.Runtime.Test.Control
             Assert.Equal(InvalidSourceDetail.IncorrectReturnArgumentCount, exception.DetailCode);
         }
 
+        [Theory]
+        [InlineData(0, VmType.Integer, VmType.Integer, VmType.Integer)]
+        [InlineData(0, VmType.Boolean, VmType.Integer, VmType.Boolean)]
+        [InlineData(0, VmType.Integer, VmType.Boolean, VmType.Boolean)]
+        [InlineData(0, VmType.Boolean, VmType.Boolean, VmType.Boolean)]
+        [InlineData(0, VmType.Integer, VmType.Integer, VmType.Boolean)]
+        [InlineData(2, VmType.Integer, VmType.Integer, VmType.Integer)]
+        [InlineData(2, VmType.Boolean, VmType.Integer, VmType.Boolean)]
+        [InlineData(2, VmType.Integer, VmType.Boolean, VmType.Boolean)]
+        [InlineData(2, VmType.Boolean, VmType.Boolean, VmType.Boolean)]
+        [InlineData(2, VmType.Integer, VmType.Integer, VmType.Boolean)]
+        public void FunctionCallWithIncorrectArgumentTypesOnExitThrows(int elementsOnStackPreCall, VmType type1, VmType type2, VmType type3)
+        {
+            var instructions1 = new List<Instruction>();
+            for (int i = 0; i < elementsOnStackPreCall; i++)
+            {
+                instructions1.Add(new Instruction(BooleanConstantToStack, true));
+            }
+            instructions1.Add(new Instruction(CallFunction, 1L));
+            instructions1.Add(new Instruction(StackToVariable, 0L));
+            instructions1.Add(new Instruction(StackToVariable, 0L));
+            for (int i = 0; i < elementsOnStackPreCall; i++)
+            {
+
+            }
+            var functionDefinition1 = new FunctionDefinition(
+                instructions1,
+                new List<VmType>(),
+                new List<VmType> { VmType.Boolean },
+                1
+            );
+
+            var functionDefinition2 = new FunctionDefinition(
+                new List<Instruction>
+                {
+                    BuildConstantToStackInstruction(type1),
+                    BuildConstantToStackInstruction(type2),
+                    BuildConstantToStackInstruction(type3),
+                },
+
+                new List<VmType> { },
+                new List<VmType> { VmType.Integer, VmType.Integer, VmType.Boolean },
+                1
+            );
+
+            var vm = new VirtualMachine(functionDefinition1, functionDefinition2);
+
+            var exception = Assert.Throws<InvalidSourceException>(() => vm.Execute());
+
+            Assert.Equal(InvalidSourceDetail.IncorrectReturnArgumentType, exception.DetailCode);
+        }
+
         #endregion
     }
 }
