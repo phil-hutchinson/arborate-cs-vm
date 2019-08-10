@@ -396,6 +396,49 @@ namespace Arborate.Runtime.Test.Control
             Assert.Equal(InvalidSourceDetail.IncorrectReturnArgumentType, exception.DetailCode);
         }
 
+        [Theory]
+        [InlineData(1)]
+        [InlineData(2)]
+        public void FunctionCallDroppingBelowMinStackThrows(int stackDeficit)
+        {
+            // Note: if isTooFew is false, is too many.
+            var functionDefinition1 = new FunctionDefinition(
+                new List<Instruction>
+                {
+                    new Instruction(IntegerConstantToStack, 5L),
+                    new Instruction(IntegerConstantToStack, 6L),
+                    new Instruction(CallFunction, 1L),
+                },
+
+                new List<VmType>(),
+                new List<VmType> { VmType.Integer, VmType.Integer, VmType.Integer },
+                0
+            );
+
+            var instructions2 = new List<Instruction>();
+            for (int i = 0; i < stackDeficit; i++)
+            {
+                instructions2.Add(new Instruction(StackToVariable, 0L));
+            }
+            for (int i = 0; i < stackDeficit; i++)
+            {
+                instructions2.Add(new Instruction(IntegerConstantToStack, 10L));
+            }
+            instructions2.Add(new Instruction(IntegerConstantToStack, 0L));
+            var functionDefinition2 = new FunctionDefinition(
+                instructions2,
+                new List<VmType> { },
+                new List<VmType> { VmType.Integer },
+                1
+            );
+
+            var vm = new VirtualMachine(functionDefinition1, functionDefinition2);
+
+            var exception = Assert.Throws<InvalidSourceException>(() => vm.Execute());
+
+            Assert.Equal(InvalidSourceDetail.TooFewElementsOnStack, exception.DetailCode);
+        }
+
         #endregion
     }
 }

@@ -134,6 +134,39 @@ namespace Arborate.Runtime
 
         private VmValue RunFunction(FunctionDefinition definition, List<VmValue> stack)
         {
+            int previousStackSize = stack.Count - definition.InParams.Count;
+
+            VmBoolean PopBoolean()
+            {
+                var poppedVal = PopValue();
+                if (!(poppedVal is VmBoolean))
+                {
+                    throw new InvalidSourceException(IncorrectElementTypeOnStack);
+                }
+                return (VmBoolean)poppedVal;
+            }
+
+            VmInteger PopInteger()
+            {
+                var poppedVal = PopValue();
+                if (!(poppedVal is VmInteger))
+                {
+                    throw new InvalidSourceException(IncorrectElementTypeOnStack);
+                }
+                return (VmInteger)poppedVal;
+            }
+
+            VmValue PopValue()
+            {
+                if (stack.Count <= previousStackSize)
+                {
+                    throw new InvalidSourceException(TooFewElementsOnStack);
+                }
+
+                var poppedVal = stack.Pop();
+                return (VmValue)poppedVal;
+            }
+
             if (stack.Count < definition.InParams.Count)
             {
                 throw new InvalidSourceException(TooFewElementsOnStack);
@@ -147,7 +180,6 @@ namespace Arborate.Runtime
                 }
             }
 
-            int previousStackSize = stack.Count - definition.InParams.Count;
 
             var localVariables = Enumerable.Repeat((VmValue)null, definition.VarCount).ToList();
 
@@ -173,7 +205,7 @@ namespace Arborate.Runtime
                     case StackToVariable:
                         {
                             long data = (long)currentInstruction.Data;
-                            var val = PopValue(stack);
+                            var val = PopValue();
                             localVariables[(int)data] = val;
                         }
                         break;
@@ -195,7 +227,7 @@ namespace Arborate.Runtime
                     case BranchTrue:
                         {
                             long branchTo = (long)currentInstruction.Data;
-                            bool checkVal = PopBoolean(stack).Val;
+                            bool checkVal = PopBoolean().Val;
                             if (checkVal)
                             {
                                 nextInstructionNumber = (int)branchTo;
@@ -206,7 +238,7 @@ namespace Arborate.Runtime
                     case BranchFalse:
                         {
                             long branchTo = (long)currentInstruction.Data;
-                            bool checkVal = PopBoolean(stack).Val;
+                            bool checkVal = PopBoolean().Val;
                             if (!checkVal)
                             {
                                 nextInstructionNumber = (int)branchTo;
@@ -224,8 +256,8 @@ namespace Arborate.Runtime
 
                     case BooleanEqual:
                         {
-                            bool val2 = PopBoolean(stack).Val;
-                            bool val1 = PopBoolean(stack).Val;
+                            bool val2 = PopBoolean().Val;
+                            bool val1 = PopBoolean().Val;
                             var result = val1 == val2;
                             stack.Push(new VmBoolean(result));
                         }
@@ -233,8 +265,8 @@ namespace Arborate.Runtime
 
                     case BooleanNotEqual:
                         {
-                            bool val2 = PopBoolean(stack).Val;
-                            bool val1 = PopBoolean(stack).Val;
+                            bool val2 = PopBoolean().Val;
+                            bool val1 = PopBoolean().Val;
                             var result = val1 != val2;
                             stack.Push(new VmBoolean(result));
                         }
@@ -242,8 +274,8 @@ namespace Arborate.Runtime
 
                     case BooleanAnd:
                         {
-                            bool val2 = PopBoolean(stack).Val;
-                            bool val1 = PopBoolean(stack).Val;
+                            bool val2 = PopBoolean().Val;
+                            bool val1 = PopBoolean().Val;
                             var result = val1 && val2;
                             stack.Push(new VmBoolean(result));
                         }
@@ -251,8 +283,8 @@ namespace Arborate.Runtime
 
                     case BooleanOr:
                         {
-                            bool val2 = PopBoolean(stack).Val;
-                            bool val1 = PopBoolean(stack).Val;
+                            bool val2 = PopBoolean().Val;
+                            bool val1 = PopBoolean().Val;
                             var result = val1 || val2;
                             stack.Push(new VmBoolean(result));
                         }
@@ -260,7 +292,7 @@ namespace Arborate.Runtime
 
                     case BooleanNot:
                         {
-                            bool val = PopBoolean(stack).Val;
+                            bool val = PopBoolean().Val;
                             var result = !val;
                             stack.Push(new VmBoolean(result));
                         }
@@ -276,8 +308,8 @@ namespace Arborate.Runtime
 
                     case IntegerEqual:
                         {
-                            long val2 = PopInteger(stack).Val;
-                            long val1 = PopInteger(stack).Val;
+                            long val2 = PopInteger().Val;
+                            long val1 = PopInteger().Val;
                             var result = val1 == val2;
                             stack.Push(new VmBoolean(result));
                         }
@@ -285,8 +317,8 @@ namespace Arborate.Runtime
 
                     case IntegerNotEqual:
                         {
-                            long val2 = PopInteger(stack).Val;
-                            long val1 = PopInteger(stack).Val;
+                            long val2 = PopInteger().Val;
+                            long val1 = PopInteger().Val;
                             var result = val1 != val2;
                             stack.Push(new VmBoolean(result));
                         }
@@ -294,8 +326,8 @@ namespace Arborate.Runtime
 
                     case IntegerAdd:
                         {
-                            long val2 = PopInteger(stack).Val;
-                            long val1 = PopInteger(stack).Val;
+                            long val2 = PopInteger().Val;
+                            long val1 = PopInteger().Val;
                             var result = val1 +  val2;
                             stack.Push(new VmInteger(result));
                         }
@@ -303,8 +335,8 @@ namespace Arborate.Runtime
 
                     case IntegerSubtract:
                         {
-                            long val2 = PopInteger(stack).Val;
-                            long val1 = PopInteger(stack).Val;
+                            long val2 = PopInteger().Val;
+                            long val1 = PopInteger().Val;
                             var result = val1 - val2;
                             stack.Push(new VmInteger(result));
                         }
@@ -312,8 +344,8 @@ namespace Arborate.Runtime
 
                     case IntegerMultiply:
                         {
-                            long val2 = PopInteger(stack).Val;
-                            long val1 = PopInteger(stack).Val;
+                            long val2 = PopInteger().Val;
+                            long val1 = PopInteger().Val;
                             var result = val1 * val2;
                             stack.Push(new VmInteger(result));
                         }
@@ -321,8 +353,8 @@ namespace Arborate.Runtime
 
                     case IntegerDivide:
                         {
-                            long val2 = PopInteger(stack).Val;
-                            long val1 = PopInteger(stack).Val;
+                            long val2 = PopInteger().Val;
+                            long val1 = PopInteger().Val;
                             var result = (val2 == 0L) ? 0L : val1 / val2;
                             stack.Push(new VmInteger(result));
                         }
@@ -330,8 +362,8 @@ namespace Arborate.Runtime
 
                     case IntegerModulus:
                         {
-                            long val2 = PopInteger(stack).Val;
-                            long val1 = PopInteger(stack).Val;
+                            long val2 = PopInteger().Val;
+                            long val1 = PopInteger().Val;
                             var result = (val2 == 0L) ? 0L : val1 % val2;
                             stack.Push(new VmInteger(result));
                         }
@@ -356,47 +388,6 @@ namespace Arborate.Runtime
             }
 
             return stack.Pop();
-        }
-
-        private VmBoolean PopBoolean(List<VmValue> stack)
-        {
-            if (stack.Count == 0)
-            {
-                throw new InvalidSourceException(TooFewElementsOnStack);
-            }
-
-            var poppedVal = stack.Pop();
-            if (!(poppedVal is VmBoolean))
-            {
-                throw new InvalidSourceException(IncorrectElementTypeOnStack);
-            }
-            return (VmBoolean)poppedVal;
-        }
-
-        private VmInteger PopInteger(List<VmValue> stack)
-        {
-            if (stack.Count == 0)
-            {
-                throw new InvalidSourceException(TooFewElementsOnStack);
-            }
-
-            var poppedVal = stack.Pop();
-            if (!(poppedVal is VmInteger))
-            {
-                throw new InvalidSourceException(IncorrectElementTypeOnStack);
-            }
-            return (VmInteger)poppedVal;
-        }
-
-        private VmValue PopValue(List<VmValue> stack)
-        {
-            if (stack.Count == 0)
-            {
-                throw new InvalidSourceException(TooFewElementsOnStack);
-            }
-
-            var poppedVal = stack.Pop();
-            return (VmValue)poppedVal;
         }
     }
 }
