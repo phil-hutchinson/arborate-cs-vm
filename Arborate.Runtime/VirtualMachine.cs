@@ -147,6 +147,8 @@ namespace Arborate.Runtime
                 }
             }
 
+            int previousStackSize = stack.Count - definition.InParams.Count;
+
             var localVariables = Enumerable.Repeat((VmValue)null, definition.VarCount).ToList();
 
             var instructionNumber = 0;
@@ -339,7 +341,7 @@ namespace Arborate.Runtime
                 instructionNumber = nextInstructionNumber;
             }
 
-            if (stack.Count != definition.OutParams.Count)
+            if (stack.Count != previousStackSize + definition.OutParams.Count)
             {
                 throw new InvalidSourceException(IncorrectReturnArgumentCount);
             }

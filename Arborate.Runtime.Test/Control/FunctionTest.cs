@@ -137,6 +137,47 @@ namespace Arborate.Runtime.Test.Control
 
             Assert.Equal(expected, actual);
         }
+
+        [Theory]
+        [InlineData(20L, 5L, 1500L)]
+        [InlineData(10L, 11L, -100L)]
+        public void VirtualMachineExecutesCallFunctionCorrectlyWithItemsOnStack(int paramValue1, int paramValue2, long expected)
+        {
+            var functionDefinition1 = new FunctionDefinition(
+                new List<Instruction>()
+                {
+                    new Instruction(IntegerConstantToStack, 10),
+                    new Instruction(IntegerConstantToStack, 10),
+                    new Instruction(IntegerConstantToStack, paramValue1),
+                    new Instruction(IntegerConstantToStack, paramValue2),
+                    new Instruction(CallFunction, 1L),
+                    new Instruction(IntegerMultiply),
+                    new Instruction(IntegerMultiply),
+                },
+                new List<VmType>(),
+                new List<VmType> { VmType.Integer },
+                0
+            );
+
+            var functionDefinition2 = new FunctionDefinition(
+                new List<Instruction>()
+                {
+                    new Instruction(IntegerSubtract),
+                },
+                new List<VmType> { VmType.Integer, VmType.Integer },
+                new List<VmType> { VmType.Integer },
+                0
+            );
+
+            var vm = new VirtualMachine(functionDefinition1, functionDefinition2);
+
+            VmValue executionResult = vm.Execute();
+
+            long actual = ((VmInteger)executionResult).Val;
+
+            Assert.Equal(expected, actual);
+        }
+
         #endregion
 
         #region ThrownExceptions
