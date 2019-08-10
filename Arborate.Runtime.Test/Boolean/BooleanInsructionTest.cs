@@ -107,72 +107,72 @@ namespace Arborate.Runtime.Test.Boolean
         }
         #endregion
 
-            #region ThrownExceptions
-            [Theory]
-            [InlineData(VmType.Integer, BooleanNot)]
-            public void UnaryInstructionWithIncorrectTypesOnStackThrows(VmType type, InstructionCode instructionCode)
+        #region ThrownExceptions
+        [Theory]
+        [InlineData(VmType.Integer, BooleanNot)]
+        public void UnaryInstructionWithIncorrectTypesOnStackThrows(VmType type, InstructionCode instructionCode)
+        {
+            var instructions = new List<Instruction>()
             {
-                var instructions = new List<Instruction>()
-                {
-                    BuildConstantToStackInstruction(type),
-                    new Instruction(instructionCode)
-                };
-                var exception = Assert.Throws<InvalidSourceException>(() => ExecuteBooleanFunction(instructions));
+                BuildConstantToStackInstruction(type),
+                new Instruction(instructionCode)
+            };
+            var exception = Assert.Throws<InvalidSourceException>(() => ExecuteBooleanFunction(instructions));
 
-                Assert.Equal(InvalidSourceDetail.IncorrectElementTypeOnStack, exception.DetailCode);
+            Assert.Equal(InvalidSourceDetail.IncorrectElementTypeOnStack, exception.DetailCode);
+        }
+
+        [Theory]
+        [InlineData(VmType.Integer, VmType.Boolean, BooleanEqual)]
+        [InlineData(VmType.Boolean, VmType.Integer, BooleanEqual)]
+        [InlineData(VmType.Integer, VmType.Integer, BooleanEqual)]
+        [InlineData(VmType.Integer, VmType.Boolean, BooleanNotEqual)]
+        [InlineData(VmType.Boolean, VmType.Integer, BooleanNotEqual)]
+        [InlineData(VmType.Integer, VmType.Integer, BooleanNotEqual)]
+        [InlineData(VmType.Integer, VmType.Boolean, BooleanAnd)]
+        [InlineData(VmType.Boolean, VmType.Integer, BooleanAnd)]
+        [InlineData(VmType.Integer, VmType.Integer, BooleanAnd)]
+        [InlineData(VmType.Integer, VmType.Boolean, BooleanOr)]
+        [InlineData(VmType.Boolean, VmType.Integer, BooleanOr)]
+        [InlineData(VmType.Integer, VmType.Integer, BooleanOr)]
+        public void BinaryInstructionWithIncorrectTypesOnStackThrows(VmType type1, VmType type2, InstructionCode instructionCode)
+        {
+            var instructions = new List<Instruction>()
+            {
+                BuildConstantToStackInstruction(type1),
+                BuildConstantToStackInstruction(type2),
+                new Instruction(instructionCode)
+            };
+            var exception = Assert.Throws<InvalidSourceException>(() => ExecuteBooleanFunction(instructions));
+
+            Assert.Equal(InvalidSourceDetail.IncorrectElementTypeOnStack, exception.DetailCode);
+        }
+
+        [Theory]
+        [InlineData(0, BooleanEqual)]
+        [InlineData(1, BooleanEqual)]
+        [InlineData(0, BooleanNotEqual)]
+        [InlineData(1, BooleanNotEqual)]
+        [InlineData(0, BooleanAnd)]
+        [InlineData(1, BooleanAnd)]
+        [InlineData(0, BooleanOr)]
+        [InlineData(1, BooleanOr)]
+        [InlineData(0, BooleanNot)]
+        public void BooleanInstructionRequiringMoreElementsThanOnStackThrows(int numberOfValuesOnStack, InstructionCode instructionCode)
+        {
+            var instructions = new List<Instruction>();
+
+            for (int i = 0; i < numberOfValuesOnStack; i++)
+            {
+                instructions.Add(new Instruction(BooleanConstantToStack, true));
             }
 
-            [Theory]
-            [InlineData(VmType.Integer, VmType.Boolean, BooleanEqual)]
-            [InlineData(VmType.Boolean, VmType.Integer, BooleanEqual)]
-            [InlineData(VmType.Integer, VmType.Integer, BooleanEqual)]
-            [InlineData(VmType.Integer, VmType.Boolean, BooleanNotEqual)]
-            [InlineData(VmType.Boolean, VmType.Integer, BooleanNotEqual)]
-            [InlineData(VmType.Integer, VmType.Integer, BooleanNotEqual)]
-            [InlineData(VmType.Integer, VmType.Boolean, BooleanAnd)]
-            [InlineData(VmType.Boolean, VmType.Integer, BooleanAnd)]
-            [InlineData(VmType.Integer, VmType.Integer, BooleanAnd)]
-            [InlineData(VmType.Integer, VmType.Boolean, BooleanOr)]
-            [InlineData(VmType.Boolean, VmType.Integer, BooleanOr)]
-            [InlineData(VmType.Integer, VmType.Integer, BooleanOr)]
-            public void BinaryInstructionWithIncorrectTypesOnStackThrows(VmType type1, VmType type2, InstructionCode instructionCode)
-            {
-                var instructions = new List<Instruction>()
-                {
-                    BuildConstantToStackInstruction(type1),
-                    BuildConstantToStackInstruction(type2),
-                    new Instruction(instructionCode)
-                };
-                var exception = Assert.Throws<InvalidSourceException>(() => ExecuteBooleanFunction(instructions));
+            instructions.Add(new Instruction(instructionCode));
 
-                Assert.Equal(InvalidSourceDetail.IncorrectElementTypeOnStack, exception.DetailCode);
-            }
+            var exception = Assert.Throws<InvalidSourceException>(() => ExecuteBooleanFunction(instructions));
 
-            [Theory]
-            [InlineData(0, BooleanEqual)]
-            [InlineData(1, BooleanEqual)]
-            [InlineData(0, BooleanNotEqual)]
-            [InlineData(1, BooleanNotEqual)]
-            [InlineData(0, BooleanAnd)]
-            [InlineData(1, BooleanAnd)]
-            [InlineData(0, BooleanOr)]
-            [InlineData(1, BooleanOr)]
-            [InlineData(0, BooleanNot)]
-            public void BooleanInstructionRequiringMoreElementsThanOnStackThrows(int numberOfValuesOnStack, InstructionCode instructionCode)
-            {
-                var instructions = new List<Instruction>();
-
-                for (int i = 0; i < numberOfValuesOnStack; i++)
-                {
-                    instructions.Add(new Instruction(BooleanConstantToStack, true));
-                }
-
-                instructions.Add(new Instruction(instructionCode));
-
-                var exception = Assert.Throws<InvalidSourceException>(() => ExecuteBooleanFunction(instructions));
-
-                Assert.Equal(InvalidSourceDetail.TooFewElementsOnStack, exception.DetailCode);
-            }
+            Assert.Equal(InvalidSourceDetail.TooFewElementsOnStack, exception.DetailCode);
+        }
         #endregion
     }
 }

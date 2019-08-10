@@ -5,6 +5,7 @@ using static Arborate.Runtime.Exception.InvalidSourceDetail;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Arborate.Runtime.Utility;
 
 namespace Arborate.Runtime
 {
@@ -25,6 +26,7 @@ namespace Arborate.Runtime
                     CheckInstruction(instruction);
                     CheckInstructionBranch(instruction, i, currDef.Code.Count);
                     CheckInstructionVariable(instruction, currDef.VarCount);
+                    CheckInstructionCallFunction(instruction, definitions.Count());
                 }
 
                 if (currDef.OutParams.Count == 0)
@@ -95,6 +97,21 @@ namespace Arborate.Runtime
             }
         }
 
+        private void CheckInstructionCallFunction(Instruction instruction, int totalFunctions)
+        {
+            switch (instruction.InstructionCode)
+            {
+                case CallFunction:
+                    long functionCallIndex = (long)instruction.Data;
+                    if (functionCallIndex < 0 || functionCallIndex >= totalFunctions)
+                    {
+                        throw new InvalidSourceException(InvalidFunctionIndex);
+                    }
+                    break;
+            }
+        }
+
+
         private void CheckInstructionVariable(Instruction instruction, int varCount)
         {
             switch (instruction.InstructionCode)
@@ -112,11 +129,24 @@ namespace Arborate.Runtime
 
         public VmValue Execute(int functionToExecute = 0)
         {
-            return RunFunction(Definitions[functionToExecute], new Stack<VmValue>());
+            return RunFunction(Definitions[functionToExecute], new List<VmValue>());
         }
 
-        private VmValue RunFunction(FunctionDefinition definition, Stack<VmValue> stack)
+        private VmValue RunFunction(FunctionDefinition definition, List<VmValue> stack)
         {
+            if (stack.Count < definition.InParams.Count)
+            {
+                throw new InvalidSourceException(TooFewElementsOnStack);
+            }
+
+            for (int i = 0; i < definition.InParams.Count; i++)
+            {
+                if (stack[stack.Count - definition.InParams.Count + i].VmType != definition.InParams[i])
+                {
+                    throw new InvalidSourceException(IncorrectCallArgumentType);
+                }
+            }
+
             var localVariables = Enumerable.Repeat((VmValue)null, definition.VarCount).ToList();
 
             var instructionNumber = 0;
@@ -131,7 +161,9 @@ namespace Arborate.Runtime
                     case CallFunction:
                         {
                             long data = (long)currentInstruction.Data;
-                            var val = RunFunction(Definitions[(int)data], stack);
+                            var defToCall = Definitions[(int)data];
+
+                            var val = RunFunction(defToCall, stack);
                             stack.Push(val);
                         }
                         break;
@@ -309,23 +341,22 @@ namespace Arborate.Runtime
 
             if (stack.Count != definition.OutParams.Count)
             {
-                throw new InvalidSourceException(IncorrectReturnArgumentCount, $"Incorrect number of elements on stack at function exit (expected {definition?.OutParams?.Count}, actual {stack?.Count}).");
+                throw new InvalidSourceException(IncorrectReturnArgumentCount);
             }
 
-            var stackEnum = stack.GetEnumerator();
-            var outParamEnum = definition.OutParams.GetEnumerator();
-            while (stackEnum.MoveNext() && outParamEnum.MoveNext())
+
+            for (int i = 0; i < definition.OutParams.Count; i++)
             {
-                if (stackEnum.Current.VmType != outParamEnum.Current)
+                if (stack[stack.Count - 1 - i].VmType != definition.OutParams[i])
                 {
-                    throw new InvalidSourceException(IncorrectReturnArgumentType, $"Incorrect element type on stack at function exit (expected {outParamEnum?.Current.ToString()}, actual {stackEnum.Current.ToString()}).");
+                    throw new InvalidSourceException(IncorrectReturnArgumentType);
                 }
             }
 
             return stack.Pop();
         }
 
-        private VmBoolean PopBoolean(Stack<VmValue> stack)
+        private VmBoolean PopBoolean(List<VmValue> stack)
         {
             if (stack.Count == 0)
             {
@@ -340,7 +371,7 @@ namespace Arborate.Runtime
             return (VmBoolean)poppedVal;
         }
 
-        private VmInteger PopInteger(Stack<VmValue> stack)
+        private VmInteger PopInteger(List<VmValue> stack)
         {
             if (stack.Count == 0)
             {
@@ -355,7 +386,7 @@ namespace Arborate.Runtime
             return (VmInteger)poppedVal;
         }
 
-        private VmValue PopValue(Stack<VmValue> stack)
+        private VmValue PopValue(List<VmValue> stack)
         {
             if (stack.Count == 0)
             {

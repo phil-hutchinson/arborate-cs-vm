@@ -14,5 +14,7 @@
         TooFewElementsOnStack,
         InvalidBranchDestination,
         InvalidVariableIndex,
+        InvalidFunctionIndex,
+        IncorrectCallArgumentType,
     }
 }
