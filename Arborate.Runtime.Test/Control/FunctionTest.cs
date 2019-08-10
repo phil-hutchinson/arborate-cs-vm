@@ -243,6 +243,66 @@ namespace Arborate.Runtime.Test.Control
 
             Assert.Equal(InvalidSourceDetail.IncorrectCallArgumentType, exception.DetailCode);
         }
+
+        [Theory]
+        [InlineData(0, 0, 1, true)]
+        [InlineData(0, 0, 2, true)]
+        [InlineData(4, 0, 1, true)]
+        [InlineData(4, 0, 2, true)]
+        [InlineData(4, 2, 1, true)]
+        [InlineData(4, 2, 2, true)]
+        [InlineData(0, 0, 1, false)]
+        [InlineData(0, 0, 2, false)]
+        [InlineData(4, 0, 1, false)]
+        [InlineData(4, 0, 2, false)]
+        [InlineData(4, 2, 1, false)]
+        [InlineData(4, 2, 2, false)]
+        public void FunctionCallWithIncorrectArgumentCountOnExitThrows(int elementsOnStackPreCall, int inParamCount, int outParamCount, bool isTooFew)
+        {
+            // Note: if isTooFew is false, is too many.
+            var instructions1 = new List<Instruction>();
+            for (int i = 0; i < elementsOnStackPreCall; i++)
+            {
+                instructions1.Add(new Instruction(IntegerConstantToStack, 1L));
+            }
+            instructions1.Add(new Instruction(CallFunction, 1L));
+            var functionDefinition1 = new FunctionDefinition(
+                instructions1,
+                new List<VmType>(),
+                new List<VmType> { VmType.Integer },
+                0
+            );
+
+            var instructions2 = new List<Instruction>();
+            var inParams2 = new List<VmType>();
+            for (int i = 0; i < inParamCount; i++)
+            {
+                instructions2.Add(new Instruction(StackToVariable, 0L));
+                inParams2.Add(VmType.Integer);
+            }
+            var outParams2 = new List<VmType>();
+            for (int i = 0; i < outParamCount; i++)
+            {
+                outParams2.Add(VmType.Integer);
+            }
+            for (int i = 0; i < outParamCount + (isTooFew ? -1 : 1); i++)
+            {
+                instructions2.Add(new Instruction(IntegerConstantToStack, 0L));
+            }
+            var functionDefinition2 = new FunctionDefinition(
+                instructions2,
+                inParams2,
+                outParams2,
+                1
+            );
+
+            var vm = new VirtualMachine(functionDefinition1, functionDefinition2);
+
+            var exception = Assert.Throws<InvalidSourceException>(() => vm.Execute());
+
+            Assert.Equal(InvalidSourceDetail.IncorrectReturnArgumentCount, exception.DetailCode);
+        }
+
         #endregion
     }
 }
