@@ -178,6 +178,47 @@ namespace Arborate.Runtime.Test.Control
             Assert.Equal(expected, actual);
         }
 
+        [Theory]
+        [InlineData(100L, 5L, 48L, 12L, 16L)]
+        [InlineData(33L, 3L, 56L, 2L, -17L)]
+        public void CallFunctionBehavesCorrectlyWithMultipleReturnValues(int paramValue1, int paramValue2, int paramValue3, int paramValue4, long expected)
+        {
+            var functionDefinition1 = new FunctionDefinition(
+                new List<Instruction>()
+                {
+                    new Instruction(IntegerConstantToStack, paramValue1),
+                    new Instruction(IntegerConstantToStack, paramValue2),
+                    new Instruction(IntegerConstantToStack, paramValue3),
+                    new Instruction(IntegerConstantToStack, paramValue4),
+                    new Instruction(CallFunction, 1L),
+                    new Instruction(IntegerSubtract),
+                },
+                new List<VmType>(),
+                new List<VmType> { VmType.Integer },
+                0
+            );
+
+            var functionDefinition2 = new FunctionDefinition(
+                new List<Instruction>()
+                {
+                    new Instruction(IntegerDivide),
+                    new Instruction(StackToVariable, 0L),
+                    new Instruction(IntegerDivide),
+                    new Instruction(VariableToStack, 0L),
+                },
+                new List<VmType> { VmType.Integer, VmType.Integer, VmType.Integer, VmType.Integer },
+                new List<VmType> { VmType.Integer, VmType.Integer },
+                1
+            );
+
+            var vm = new VirtualMachine(functionDefinition1, functionDefinition2);
+
+            VmValue executionResult = vm.Execute();
+
+            long actual = ((VmInteger)executionResult).Val;
+
+            Assert.Equal(expected, actual);
+        }
         #endregion
 
         #region ThrownExceptions

@@ -129,10 +129,12 @@ namespace Arborate.Runtime
 
         public VmValue Execute(int functionToExecute = 0)
         {
-            return RunFunction(Definitions[functionToExecute], new List<VmValue>());
+            var stack = new List<VmValue>();
+            RunFunction(Definitions[functionToExecute], stack);
+            return stack[0];
         }
 
-        private VmValue RunFunction(FunctionDefinition definition, List<VmValue> stack)
+        private void RunFunction(FunctionDefinition definition, List<VmValue> stack)
         {
             int previousStackSize = stack.Count - definition.InParams.Count;
 
@@ -197,8 +199,7 @@ namespace Arborate.Runtime
                             long data = (long)currentInstruction.Data;
                             var defToCall = Definitions[(int)data];
 
-                            var val = RunFunction(defToCall, stack);
-                            stack.Push(val);
+                            RunFunction(defToCall, stack);
                         }
                         break;
 
@@ -385,8 +386,6 @@ namespace Arborate.Runtime
                     throw new InvalidSourceException(IncorrectReturnArgumentType);
                 }
             }
-
-            return stack.Pop();
         }
     }
 }
