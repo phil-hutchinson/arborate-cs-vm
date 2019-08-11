@@ -349,12 +349,12 @@ namespace Arborate.Runtime.Test.Control
         [InlineData(0, VmType.Boolean, VmType.Integer, VmType.Boolean)]
         [InlineData(0, VmType.Integer, VmType.Boolean, VmType.Boolean)]
         [InlineData(0, VmType.Boolean, VmType.Boolean, VmType.Boolean)]
-        [InlineData(0, VmType.Integer, VmType.Integer, VmType.Boolean)]
+        [InlineData(0, VmType.Boolean, VmType.Integer, VmType.Integer)]
         [InlineData(2, VmType.Integer, VmType.Integer, VmType.Integer)]
         [InlineData(2, VmType.Boolean, VmType.Integer, VmType.Boolean)]
         [InlineData(2, VmType.Integer, VmType.Boolean, VmType.Boolean)]
         [InlineData(2, VmType.Boolean, VmType.Boolean, VmType.Boolean)]
-        [InlineData(2, VmType.Integer, VmType.Integer, VmType.Boolean)]
+        [InlineData(2, VmType.Boolean, VmType.Integer, VmType.Integer)]
         public void FunctionCallWithIncorrectArgumentTypesOnExitThrows(int elementsOnStackPreCall, VmType type1, VmType type2, VmType type3)
         {
             var instructions1 = new List<Instruction>();

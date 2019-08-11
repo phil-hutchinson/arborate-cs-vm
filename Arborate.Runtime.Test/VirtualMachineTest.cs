@@ -39,7 +39,7 @@ namespace Arborate.Runtime.Test
         public void FunctionWithIncorrectReturnArgumentTypeThrows(VmType[] outParams, VmType[] stackParams)
         {
             var instructions = new List<Instruction>();
-            foreach(var vmType in Enumerable.Reverse(stackParams))
+            foreach(var vmType in stackParams)
             {
                 switch (vmType)
                 {

@@ -378,10 +378,9 @@ namespace Arborate.Runtime
                 throw new InvalidSourceException(IncorrectReturnArgumentCount);
             }
 
-
             for (int i = 0; i < definition.OutParams.Count; i++)
             {
-                if (stack[stack.Count - 1 - i].VmType != definition.OutParams[i])
+                if (stack[stack.Count - definition.OutParams.Count + i].VmType != definition.OutParams[i])
                 {
                     throw new InvalidSourceException(IncorrectReturnArgumentType);
                 }
