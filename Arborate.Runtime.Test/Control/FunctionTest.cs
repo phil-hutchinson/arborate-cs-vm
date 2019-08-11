@@ -42,7 +42,7 @@ namespace Arborate.Runtime.Test.Control
 
             var vm = new VirtualMachine(functionDefinition1, functionDefinition2);
 
-            VmValue executionResult = vm.Execute();
+            VmValue executionResult = vm.Execute()[0];
 
             long actual = ((VmInteger)executionResult).Val;
 
@@ -78,7 +78,7 @@ namespace Arborate.Runtime.Test.Control
 
             var vm = new VirtualMachine(functionDefinition1, functionDefinition2);
 
-            VmValue executionResult = vm.Execute();
+            VmValue executionResult = vm.Execute()[0];
 
             long actual = ((VmInteger)executionResult).Val;
 
@@ -131,7 +131,7 @@ namespace Arborate.Runtime.Test.Control
 
             var vm = new VirtualMachine(functionDefinition1, functionDefinition2);
 
-            VmValue executionResult = vm.Execute();
+            VmValue executionResult = vm.Execute()[0];
 
             long actual = ((VmInteger)executionResult).Val;
 
@@ -171,7 +171,7 @@ namespace Arborate.Runtime.Test.Control
 
             var vm = new VirtualMachine(functionDefinition1, functionDefinition2);
 
-            VmValue executionResult = vm.Execute();
+            VmValue executionResult = vm.Execute()[0];
 
             long actual = ((VmInteger)executionResult).Val;
 
@@ -213,7 +213,7 @@ namespace Arborate.Runtime.Test.Control
 
             var vm = new VirtualMachine(functionDefinition1, functionDefinition2);
 
-            VmValue executionResult = vm.Execute();
+            VmValue executionResult = vm.Execute()[0];
 
             long actual = ((VmInteger)executionResult).Val;
 

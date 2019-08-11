@@ -110,11 +110,57 @@ namespace Arborate.Runtime.Test
 
             var vm = new VirtualMachine(functionDefinition1, functionDefinition2);
 
-            VmValue executionResult = vm.Execute(functionToExecute ?? 0);
+            VmValue executionResult = vm.Execute(functionToExecute ?? 0)[0];
 
             long actual = ((VmInteger)executionResult).Val;
 
             Assert.Equal(expected, actual);
+        }
+
+        [Theory]
+        [InlineData(100L, 23L, 4L, 8L)]
+        [InlineData(21L, 4L, 5L, 1L)]
+        [InlineData(122L, 10L, 12L, 2L)]
+        public void VirtualMachineRetrnsMultipleValues(long dividend, long divisor, long expectedQuotient, long expectedRemainder)
+        {
+            var functionDefinition1 = new FunctionDefinition(
+                new List<Instruction>()
+                {
+                    new Instruction(IntegerConstantToStack, dividend),
+                    new Instruction(IntegerConstantToStack, divisor),
+                    new Instruction(CallFunction, 1L),
+                },
+                new List<VmType>(),
+                new List<VmType> { VmType.Integer, VmType.Integer },
+                0
+            );
+
+            var functionDefinition2 = new FunctionDefinition(
+                new List<Instruction>()
+                {
+                    new Instruction(StackToVariable, 1L),
+                    new Instruction(StackToVariable, 0L),
+                    new Instruction(VariableToStack, 0L),
+                    new Instruction(VariableToStack, 1L),
+                    new Instruction(IntegerDivide),
+                    new Instruction(VariableToStack, 0L),
+                    new Instruction(VariableToStack, 1L),
+                    new Instruction(IntegerModulus),
+                },
+                new List<VmType> { VmType.Integer, VmType.Integer },
+                new List<VmType> { VmType.Integer, VmType.Integer },
+                2
+            );
+
+            var vm = new VirtualMachine(functionDefinition1, functionDefinition2);
+
+            IList<VmValue> executionResult = vm.Execute();
+
+            long actualQuotient = ((VmInteger)executionResult[0]).Val;
+            long actualRemainder = ((VmInteger)executionResult[1]).Val;
+
+            Assert.Equal(expectedQuotient, actualQuotient);
+            Assert.Equal(expectedRemainder, actualRemainder);
         }
 
 

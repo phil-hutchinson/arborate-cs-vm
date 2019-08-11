@@ -17,7 +17,7 @@ namespace Arborate.Runtime.Test
             var functionDefinition = new FunctionDefinition(instructions, inParams, outParams, varCount);
             var machine = new VirtualMachine(functionDefinition);
             var executionResult = machine.Execute();
-            return new List<VmValue>() { executionResult };
+            return executionResult;
             //yield return executionResult; // can remove the yield when vm returns multiple types properly
         }
 

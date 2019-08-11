@@ -127,11 +127,11 @@ namespace Arborate.Runtime
             }
         }
 
-        public VmValue Execute(int functionToExecute = 0)
+        public IList<VmValue> Execute(int functionToExecute = 0)
         {
             var stack = new List<VmValue>();
             RunFunction(Definitions[functionToExecute], stack);
-            return stack[0];
+            return stack;
         }
 
         private void RunFunction(FunctionDefinition definition, List<VmValue> stack)
